@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="#{view.index.title}">Welcome!</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link href="../../../resources/css/bootstrap.min.css" rel="stylesheet" media="screen" th:href="@{/resources/css/bootstrap.min.css}"/>
+    <link href="../../../resources/css/core.css" rel="stylesheet" media="screen" th:href="@{/resources/css/core.css}" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.2/css/jquery.dataTables.min.css">
+    <script src="../../../resources/js/jquery.min.js" th:src="@{/resources/js/jquery.min.js}"></script>
+    <script src="../../../resources/js/bootstrap.min.js" th:src="@{/resources/js/bootstrap.min.js}"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.2/js/jquery.dataTables.min.js"></script>
+</head>
+<body>
+<div th:replace="fragments/layout :: header"></div>
+<div class="container">
+
+    <table id="dtBasicExample" class="table table-dark">
+        <thead>
+        <tr>
+            <th scope="col">date</th>
+            <th scope="col">BTC USD</th>
+            <th scope="col">Buy Bitcoin</th>
+            <th scope="col">Percentage</th>
+            <th scope="col">Close Price</th>
+            <th scope="col">+/-</th>
+            <th scope="col">Buy/Sell</th>
+        </tr>
+        </thead>
+        <tbody>
+            <tr th:each="buySellBtcUsd : ${buySellBtcUsdList}">
+                <td th:text="${buySellBtcUsd.date}"></td>
+                <td th:text="${buySellBtcUsd.btcUsdGoogleTrends}"></td>
+                <td th:text="${buySellBtcUsd.buyBitcoinGoogleTrends}"></td>
+                <td th:text="${buySellBtcUsd.percentageBtcUsdBuyBitcoin}"></td>
+                <td th:text="${buySellBtcUsd.price}"></td>
+                <td th:text="${buySellBtcUsd.diffYesterdayAndToday}"></td>
+
+                <td th:switch="${buySellBtcUsd.decision}">
+                    <p th:case="SELL" style="color: red" th:text="${buySellBtcUsd.decision}"></p>
+                    <p th:case="BUY" style="color: green" th:text="${buySellBtcUsd.decision}"></p>
+                    <p th:case="*" th:text="${buySellBtcUsd.decision}"></p>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#dtBasicExample').DataTable();
+    } );
+</script>
+<div th:replace="fragments/layout :: footer"></div>
+</body>
+</html>
