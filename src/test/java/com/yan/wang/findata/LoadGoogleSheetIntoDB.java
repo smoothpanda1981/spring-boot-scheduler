@@ -74,7 +74,7 @@ public class LoadGoogleSheetIntoDB {
         // Build a new authorized API client service.
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
         final String spreadsheetId = "1568z5bdwt8kkXcH4iYjWYcGQQTJWvS-Z7xlShP9X0VY";
-        final String range = "Finance!A2:G176"; //A2:G176
+        final String range = "Finance!A2:G177"; //A2:G176
         Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT)).setApplicationName(APPLICATION_NAME).build();
         ValueRange response = service.spreadsheets().values().get(spreadsheetId, range).execute();
         List<List<Object>> values = response.getValues();
