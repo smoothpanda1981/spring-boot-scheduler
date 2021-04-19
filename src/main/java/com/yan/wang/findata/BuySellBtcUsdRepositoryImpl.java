@@ -33,4 +33,34 @@ public class BuySellBtcUsdRepositoryImpl implements BuySellBtcUsdRepository {
         System.out.println("4");
         return buySellBtcUsdList;
     }
+
+    @Override
+    @Transactional
+    public BuySellBtcUsd saveBuySellBtcUsd(BuySellBtcUsd buySellBtcUsd) {
+        entityManager.persist(buySellBtcUsd);
+        return buySellBtcUsd;
+    }
+
+    @Transactional
+    public BuySellBtcUsd updateBuySellBtcUsd(BuySellBtcUsd buySellBtcUsd) {
+        entityManager.merge(buySellBtcUsd);
+        return buySellBtcUsd;
+    }
+
+    @Transactional
+    public BuySellBtcUsd deleteBuySellBtcUsd(BuySellBtcUsd buySellBtcUsd) {
+        if (entityManager.contains(buySellBtcUsd)) {
+            entityManager.remove(buySellBtcUsd);
+        } else {
+            entityManager.remove(entityManager.merge(buySellBtcUsd));
+        }
+
+        return buySellBtcUsd;
+    }
+
+    @Transactional
+    public BuySellBtcUsd getBuySellBtcUsd(int id) {
+        BuySellBtcUsd response = (BuySellBtcUsd) entityManager.find(BuySellBtcUsd.class, id);
+        return response;
+    }
 }

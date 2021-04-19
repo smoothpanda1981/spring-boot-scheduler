@@ -13,4 +13,12 @@ import java.util.List;
 public interface BuySellBtcUsdRepository {
 
 	public List<BuySellBtcUsd> getListOfBuySellBtcUsd();
+
+	public BuySellBtcUsd saveBuySellBtcUsd(BuySellBtcUsd buySellBtcUsd) ;
+
+	public BuySellBtcUsd updateBuySellBtcUsd(BuySellBtcUsd buySellBtcUsd) ;
+
+	public BuySellBtcUsd deleteBuySellBtcUsd(BuySellBtcUsd buySellBtcUsd);
+
+	public BuySellBtcUsd getBuySellBtcUsd(int id);
 }
