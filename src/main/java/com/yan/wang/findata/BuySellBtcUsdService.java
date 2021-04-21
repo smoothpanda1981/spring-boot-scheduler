@@ -93,7 +93,7 @@ public class BuySellBtcUsdService {
 		Credential credential = null;
 		try {
 			String TOKENS_DIRECTORY_PATH = "tokens";
-			List<String> SCOPES = Collections.singletonList(SheetsScopes.SPREADSHEETS_READONLY);
+			List<String> SCOPES = Collections.singletonList(SheetsScopes.SPREADSHEETS);
 
 			String credientialjson = "{\"installed\":{\"client_id\":\"680031201316-ctb077hvnmdqmkv5d5fi7fb7c38655na.apps.googleusercontent.com\",\"project_id\":\"yanweb1-1618434884982\",\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"token_uri\":\"https://oauth2.googleapis.com/token\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\",\"client_secret\":\"33lc2miI2DdrwqxaITHh5S5F\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"http://localhost\"]}}";
 			InputStream in = new ByteArrayInputStream(credientialjson.getBytes());
