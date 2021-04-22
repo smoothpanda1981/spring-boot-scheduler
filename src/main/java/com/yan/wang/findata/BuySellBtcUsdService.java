@@ -10,6 +10,7 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
+import com.google.api.client.util.store.MemoryDataStoreFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.ValueRange;
@@ -107,9 +108,15 @@ public class BuySellBtcUsdService {
 			// Build flow and trigger user authorization request.
 
 			GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
-					.setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
+					.setDataStoreFactory(new MemoryDataStoreFactory())
 					.setAccessType("offline")
 					.build();
+
+//			GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
+//					.setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
+//					.setAccessType("offline")
+//					.build();
+
 			LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
 			credential = new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
 		} catch (IOException e) {
