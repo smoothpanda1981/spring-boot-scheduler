@@ -48,47 +48,47 @@ public class BuySellBtcUsdService {
 	@Autowired
 	private BuySellBtcUsdRepository buySellBtcUsdRepository;
 
-	@PostConstruct
-	protected void initialize() {
-		System.out.println("test test");
-
-		try {
-			NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-			JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
-			String APPLICATION_NAME = "Google Sheets API Java Quickstart";
-			// Build a new authorized API client service.
-			String spreadsheetId = "1568z5bdwt8kkXcH4iYjWYcGQQTJWvS-Z7xlShP9X0VY";
-			String range = "Finance!A2:G"; //A2:G176
-			Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT, JSON_FACTORY)).setApplicationName(APPLICATION_NAME).build();
-
-			ValueRange response = service.spreadsheets().values().get(spreadsheetId, range).execute();
-			List<List<Object>> values = response.getValues();
-			if (values == null || values.isEmpty()) {
-				System.out.println("No data found.");
-			} else {
-				System.out.println("Major");
-
-				for (List row : values) {
-					System.out.printf("%s, %s, %s, %s, %s, %s, %s\n", row.get(0), row.get(1), row.get(2), row.get(3), row.get(4), row.get(5), row.get(6));
-					BuySellBtcUsd buySellBtcUsd = new BuySellBtcUsd();
-					buySellBtcUsd.setDate(row.get(0).toString());
-					buySellBtcUsd.setBtcUsdGoogleTrends(Integer.parseInt(row.get(1).toString()));
-					buySellBtcUsd.setBuyBitcoinGoogleTrends(Integer.parseInt(row.get(2).toString()));
-					buySellBtcUsd.setPrice(Double.parseDouble(row.get(3).toString()));
-					buySellBtcUsd.setPercentageBtcUsdBuyBitcoin(Double.parseDouble(row.get(4).toString().substring(0, row.get(4).toString().length() - 1)));
-					buySellBtcUsd.setDiffYesterdayAndToday(Integer.parseInt(row.get(6).toString()));
-					buySellBtcUsd.setDecision(row.get(5).toString());
-					buySellBtcUsdRepository.saveBuySellBtcUsd(buySellBtcUsd);
-				}
-			}
-		} catch (GeneralSecurityException e) {
-			e.printStackTrace();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+//	@PostConstruct
+//	protected void initialize() {
+//		System.out.println("test test");
+//
+//		try {
+//			NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+//			JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
+//			String APPLICATION_NAME = "Google Sheets API Java Quickstart";
+//			// Build a new authorized API client service.
+//			String spreadsheetId = "1568z5bdwt8kkXcH4iYjWYcGQQTJWvS-Z7xlShP9X0VY";
+//			String range = "Finance!A2:G"; //A2:G176
+//			Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT, JSON_FACTORY)).setApplicationName(APPLICATION_NAME).build();
+//
+//			ValueRange response = service.spreadsheets().values().get(spreadsheetId, range).execute();
+//			List<List<Object>> values = response.getValues();
+//			if (values == null || values.isEmpty()) {
+//				System.out.println("No data found.");
+//			} else {
+//				System.out.println("Major");
+//
+//				for (List row : values) {
+//					System.out.printf("%s, %s, %s, %s, %s, %s, %s\n", row.get(0), row.get(1), row.get(2), row.get(3), row.get(4), row.get(5), row.get(6));
+//					BuySellBtcUsd buySellBtcUsd = new BuySellBtcUsd();
+//					buySellBtcUsd.setDate(row.get(0).toString());
+//					buySellBtcUsd.setBtcUsdGoogleTrends(Integer.parseInt(row.get(1).toString()));
+//					buySellBtcUsd.setBuyBitcoinGoogleTrends(Integer.parseInt(row.get(2).toString()));
+//					buySellBtcUsd.setPrice(Double.parseDouble(row.get(3).toString()));
+//					buySellBtcUsd.setPercentageBtcUsdBuyBitcoin(Double.parseDouble(row.get(4).toString().substring(0, row.get(4).toString().length() - 1)));
+//					buySellBtcUsd.setDiffYesterdayAndToday(Integer.parseInt(row.get(6).toString()));
+//					buySellBtcUsd.setDecision(row.get(5).toString());
+//					buySellBtcUsdRepository.saveBuySellBtcUsd(buySellBtcUsd);
+//				}
+//			}
+//		} catch (GeneralSecurityException e) {
+//			e.printStackTrace();
+//		} catch (FileNotFoundException e) {
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//	}
 
 	private Credential getCredentials(NetHttpTransport HTTP_TRANSPORT, JsonFactory JSON_FACTORY) {
 		Credential credential = null;
