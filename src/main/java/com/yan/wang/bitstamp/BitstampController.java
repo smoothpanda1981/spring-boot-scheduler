@@ -33,7 +33,6 @@ public class BitstampController {
     public ModelAndView getGeneralData() {
 
         try {
-            System.out.println("test 1");
             Properties props = new Properties();
             props.load(new FileInputStream("/tmp/bitstamp/bitstampapi.properties"));
 
@@ -72,8 +71,29 @@ public class BitstampController {
                 }
             }
 
+            List<Balance> balanceList3 = new ArrayList<Balance>();
+            for (Balance balance : balanceList2) {
+                Balance balance3 = new Balance();
+                balance3.setName(balance.getName());
+                balance3.setValue(balance.getValue());
+                balance3.setCurrentPrice(balance.getCurrentPrice());
+                balance3.setPaidPrice(getPaidPrice(props, balance.getName()));
+                balanceList3.add(balance3);
+            }
+
+            List<Balance> balanceList4 = new ArrayList<Balance>();
+            for (Balance balance : balanceList3) {
+                Balance balance4 = new Balance();
+                balance4.setName(balance.getName());
+                balance4.setValue(balance.getValue());
+                balance4.setCurrentPrice(balance.getCurrentPrice());
+                balance4.setPaidPrice(balance.getPaidPrice());
+                balance4.setProfitOrLoss(computeProfitOrLossCurrentPrice(balance.getCurrentPrice(), balance.getPaidPrice()));
+                balanceList4.add(balance4);
+            }
+
             ModelAndView modelAndView = new ModelAndView("bitstamp/bitstamp");
-            modelAndView.addObject("balanceList", balanceList2);
+            modelAndView.addObject("balanceList", balanceList4);
             return modelAndView;
 
         } catch (Exception e) {
@@ -165,5 +185,58 @@ public class BitstampController {
         // Finally we have the response
         return currentPrice.getLast();
 
+    }
+
+    private String getPaidPrice(Properties props, String name) {
+        String result;
+        String crypto = name.replace("_balance", "");
+        String keySecondPart = ".paid.price";
+        if (props.getProperty(crypto+keySecondPart) !=  null) {
+            result = props.getProperty(crypto+keySecondPart);
+        } else {
+            result = "-";
+        }
+        return result;
+    }
+
+    private String computeProfitOrLossCurrentPrice(String currentPrice, String paidPrice) {
+        String result;
+        if (paidPrice.equals("-")) {
+            result = "black";
+        } else if (paidPrice.contains(",")) {
+            String[] tab = paidPrice.split(",");
+            Double[] tabD = new Double[tab.length];
+            for (int i = 0; i < tab.length; i++) {
+                tabD[i] = Double.parseDouble(tab[i]);
+            }
+
+            Double maxPaidPriceD = tabD[0];
+            for (int counter = 1; counter < tabD.length; counter++) {
+                if (tabD[counter] > maxPaidPriceD) {
+                    maxPaidPriceD = tabD[counter];
+                }
+            }
+
+            Double currentPriceD = Double.parseDouble(currentPrice);
+            if (maxPaidPriceD > currentPriceD) {
+                result = "red";
+            } else if (maxPaidPriceD == currentPriceD) {
+                result = "black";
+            } else {
+                result = "green";
+            }
+        } else {
+            Double currentPriceD = Double.parseDouble(currentPrice);
+            Double paidPriceD = Double.parseDouble(paidPrice);
+            if (paidPriceD > currentPriceD) {
+                result = "red";
+            } else if (paidPriceD == currentPriceD) {
+                result = "black";
+            } else {
+                result = "green";
+            }
+        }
+
+        return result;
     }
 }

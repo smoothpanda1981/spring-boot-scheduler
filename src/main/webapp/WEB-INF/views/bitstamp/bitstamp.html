@@ -24,8 +24,13 @@
         <tr th:each="balanceList : ${balanceList}">
             <td th:text="${balanceList.name}"></td>
             <td th:text="${balanceList.value}"></td>
-            <td>N/A</td>
-            <td th:text="${balanceList.currentPrice}"></td>
+            <td th:text="${balanceList.paidPrice}"></td>
+            <td th:switch="${balanceList.profitOrLoss}">
+                <span th:case="'black'" th:text="${balanceList.currentPrice}"></span>
+                <span th:case="'red'" th:style="'color:red'" th:text="${balanceList.currentPrice}"></span>
+                <span th:case="'green'" th:style="'color:green'" th:text="${balanceList.currentPrice}"></span>
+            </td>
+            <td ></td>
         </tr>
     </tbody>
 </table>

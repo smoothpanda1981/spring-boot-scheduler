@@ -6,7 +6,11 @@ public class Balance {
 
 	private String value;
 
+	private String paidPrice;
+
 	private String currentPrice;
+
+	private String profitOrLoss;
 
 	public String getName() {
 		return name;
@@ -30,5 +34,21 @@ public class Balance {
 
 	public void setCurrentPrice(String currentPrice) {
 		this.currentPrice = currentPrice;
+	}
+
+	public String getPaidPrice() {
+		return paidPrice;
+	}
+
+	public void setPaidPrice(String paidPrice) {
+		this.paidPrice = paidPrice;
+	}
+
+	public String getProfitOrLoss() {
+		return profitOrLoss;
+	}
+
+	public void setProfitOrLoss(String profitOrLoss) {
+		this.profitOrLoss = profitOrLoss;
 	}
 }
