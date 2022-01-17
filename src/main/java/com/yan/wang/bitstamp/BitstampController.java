@@ -33,7 +33,7 @@ public class BitstampController {
 
         try {
             Properties props = new Properties();
-            props.load(new FileInputStream("/tmp/bitstamp/bitstampapi.properties"));
+            props.load(new FileInputStream("/home/ywang/bitstamp/bitstampapi.properties"));
 
             String result = getBalance(props).replace(" ", "");
 
@@ -106,7 +106,7 @@ public class BitstampController {
         Properties props = new Properties();
         Balance balance = new Balance();
         try {
-            props.load(new FileInputStream("/tmp/bitstamp/bitstampapi.properties"));
+            props.load(new FileInputStream("/home/ywang/bitstamp/bitstampapi.properties"));
             if (props.getProperty(cryptoId.replace("_balance", "") + ".paid.price") !=  null) {
                 balance.setName(cryptoId);
                 balance.setValue(cryptoId.replace("_balance", "") + ".paid.price");
@@ -135,12 +135,12 @@ public class BitstampController {
     @PostMapping(value = {"/bitstamp/{cryptoId}/edit"})
     public String updateCryptoId(@PathVariable String cryptoId, @ModelAttribute("paidPriceObject") Balance balance) {
         try {
-            FileInputStream in = new FileInputStream("/tmp/bitstamp/bitstampapi.properties");
+            FileInputStream in = new FileInputStream("/home/ywang/bitstamp/bitstampapi.properties");
             Properties props = new Properties();
             props.load(in);
             in.close();
 
-            FileOutputStream out = new FileOutputStream("/tmp/bitstamp/bitstampapi.properties");
+            FileOutputStream out = new FileOutputStream("/home/ywang/bitstamp/bitstampapi.properties");
             String key = cryptoId.replace("_balance", "") + ".paid.price";
             props.setProperty(key, balance.getPaidPrice());
             props.store(out, null);
