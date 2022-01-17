@@ -12,6 +12,8 @@ public class Balance {
 
 	private String profitOrLoss;
 
+	private String priceUpDownPercent;
+
 	public String getName() {
 		return name;
 	}
@@ -50,5 +52,13 @@ public class Balance {
 
 	public void setProfitOrLoss(String profitOrLoss) {
 		this.profitOrLoss = profitOrLoss;
+	}
+
+	public String getPriceUpDownPercent() {
+		return priceUpDownPercent;
+	}
+
+	public void setPriceUpDownPercent(String priceUpDownPercent) {
+		this.priceUpDownPercent = priceUpDownPercent;
 	}
 }

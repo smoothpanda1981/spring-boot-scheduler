@@ -22,6 +22,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.text.DecimalFormat;
 import java.util.*;
 
 @Controller
@@ -87,6 +88,7 @@ public class BitstampController {
                 balance4.setCurrentPrice(balance.getCurrentPrice());
                 balance4.setPaidPrice(balance.getPaidPrice());
                 balance4.setProfitOrLoss(computeProfitOrLossCurrentPrice(balance.getCurrentPrice(), balance.getPaidPrice()));
+                balance4.setPriceUpDownPercent(computeUpDownPercentage(balance.getPaidPrice(), balance.getCurrentPrice()));
                 balanceList4.add(balance4);
             }
 
@@ -279,14 +281,14 @@ public class BitstampController {
                 tabD[i] = Double.parseDouble(tab[i]);
             }
 
-            Double maxPaidPriceD = tabD[0];
+            double maxPaidPriceD = tabD[0];
             for (int counter = 1; counter < tabD.length; counter++) {
                 if (tabD[counter] > maxPaidPriceD) {
                     maxPaidPriceD = tabD[counter];
                 }
             }
 
-            Double currentPriceD = Double.parseDouble(currentPrice);
+            double currentPriceD = Double.parseDouble(currentPrice);
             if (maxPaidPriceD > currentPriceD) {
                 result = "red";
             } else if (maxPaidPriceD == currentPriceD) {
@@ -295,8 +297,8 @@ public class BitstampController {
                 result = "green";
             }
         } else {
-            Double currentPriceD = Double.parseDouble(currentPrice);
-            Double paidPriceD = Double.parseDouble(paidPrice);
+            double currentPriceD = Double.parseDouble(currentPrice);
+            double paidPriceD = Double.parseDouble(paidPrice);
             if (paidPriceD > currentPriceD) {
                 result = "red";
             } else if (paidPriceD == currentPriceD) {
@@ -306,6 +308,37 @@ public class BitstampController {
             }
         }
 
+        return result;
+    }
+
+    private String computeUpDownPercentage(String paidPrice, String currentPrice) {
+        String result = "-";
+        if (!paidPrice.equals("-") && !currentPrice.equals("-")) {
+            if (paidPrice.contains(",")) {
+                String[] tab = paidPrice.split(",");
+                Double[] tabD = new Double[tab.length];
+                for (int i = 0; i < tab.length; i++) {
+                    tabD[i] = Double.parseDouble(tab[i]);
+                }
+
+                double maxPaidPriceD = tabD[0];
+                for (int counter = 1; counter < tabD.length; counter++) {
+                    if (tabD[counter] > maxPaidPriceD) {
+                        maxPaidPriceD = tabD[counter];
+                    }
+                }
+                paidPrice = String.valueOf(maxPaidPriceD);
+            }
+
+            double paidPriceDouble = Double.parseDouble(paidPrice);
+            double currentPriceDouble = Double.parseDouble(currentPrice);
+            double temp = (currentPriceDouble * 100 / paidPriceDouble) - 100;
+            DecimalFormat df = new DecimalFormat("0.00");
+            result = df.format(temp);
+            if (!result.startsWith("-")) {
+                result = "+" + result;
+            }
+        }
         return result;
     }
 }
