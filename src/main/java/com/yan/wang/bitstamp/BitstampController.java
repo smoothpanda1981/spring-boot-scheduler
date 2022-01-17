@@ -7,15 +7,13 @@ import org.apache.commons.codec.binary.Hex;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
@@ -98,6 +96,77 @@ public class BitstampController {
 
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    @GetMapping(value = {"/bitstamp/{cryptoId}/edit"})
+    public ModelAndView showEditCryptoId(@PathVariable String cryptoId) {
+        Properties props = new Properties();
+        Balance balance = new Balance();
+        try {
+            props.load(new FileInputStream("/tmp/bitstamp/bitstampapi.properties"));
+            if (props.getProperty(cryptoId.replace("_balance", "") + ".paid.price") !=  null) {
+                balance.setName(cryptoId);
+                balance.setValue(cryptoId.replace("_balance", "") + ".paid.price");
+                balance.setPaidPrice(props.getProperty(cryptoId.replace("_balance", "") + ".paid.price"));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            ModelAndView modelAndView = new ModelAndView("bitstamp/edit");
+            modelAndView.addObject("paidPriceObject", balance);
+            return modelAndView;
+        }
+    }
+
+    @GetMapping(value = {"/bitstamp/{cryptoId}/add"})
+    public ModelAndView showAddCryptoId(@PathVariable String cryptoId) {
+        Balance balance = new Balance();
+        balance.setName(cryptoId);
+        balance.setValue(cryptoId.replace("_balance", "") + ".paid.price");
+        balance.setPaidPrice("");
+        ModelAndView modelAndView = new ModelAndView("bitstamp/add");
+        modelAndView.addObject("paidPriceObject", balance);
+        return modelAndView;
+    }
+
+    @PostMapping(value = {"/bitstamp/{cryptoId}/edit"})
+    public String updateCryptoId(@PathVariable String cryptoId, @ModelAttribute("paidPriceObject") Balance balance) {
+        try {
+            FileInputStream in = new FileInputStream("/tmp/bitstamp/bitstampapi.properties");
+            Properties props = new Properties();
+            props.load(in);
+            in.close();
+
+            FileOutputStream out = new FileOutputStream("/tmp/bitstamp/bitstampapi.properties");
+            String key = cryptoId.replace("_balance", "") + ".paid.price";
+            props.setProperty(key, balance.getPaidPrice());
+            props.store(out, null);
+            out.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            return "redirect:/bitstamp";
+        }
+    }
+
+    @PostMapping(value = {"/bitstamp/{cryptoId}/add"})
+    public String addCryptoId(@PathVariable String cryptoId, @ModelAttribute("paidPriceObject") Balance balance) {
+        try {
+            FileInputStream in = new FileInputStream("/tmp/bitstamp/bitstampapi.properties");
+            Properties props = new Properties();
+            props.load(in);
+            in.close();
+
+            FileOutputStream out = new FileOutputStream("/tmp/bitstamp/bitstampapi.properties");
+            String key = cryptoId.replace("_balance", "") + ".paid.price";
+            props.setProperty(key, balance.getPaidPrice());
+            props.store(out, null);
+            out.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            return "redirect:/bitstamp";
         }
     }
 
