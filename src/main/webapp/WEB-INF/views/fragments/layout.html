@@ -14,21 +14,21 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#">Demo project</a>
+            <a class="navbar-brand" href="#">Private Portal</a>
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
                 <li th:classappend="${module == 'home' ? 'active' : ''}">
                     <a href="#" th:href="@{/}">Home</a>
                 </li>
-                <li th:classappend="${module == 'about' ? 'active' : ''}">
-                    <a href="#about" th:href="@{/about}">About</a>
-                </li>
                 <li th:classappend="${module == 'findata' ? 'active' : ''}">
                     <a href="#about" th:href="@{/findata}">Findata</a>
                 </li>
                 <li th:classappend="${module == 'bitstamp' ? 'active' : ''}">
                     <a href="#about" th:href="@{/bitstamp}">Bitstamp</a>
+                </li>
+                <li th:classappend="${module == 'about' ? 'active' : ''}">
+                    <a href="#about" th:href="@{/about}">About</a>
                 </li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
@@ -52,7 +52,7 @@
 <!-- Footer -->
 <div th:fragment="footer" th:align="center">
     &copy;&nbsp;<span th:text="${#temporals.format(#temporals.createNow(), 'yyyy')}">2017</span>
-    Demo project <span th:text="${@environment.getProperty('app.version')}"></span>
+    Yan Wang <span th:text="${@environment.getProperty('app.version')}"></span>
 </div>
 
 </body>
