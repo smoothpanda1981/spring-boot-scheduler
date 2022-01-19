@@ -11,11 +11,24 @@
 <body>
 <div th:replace="fragments/layout :: header"></div>
 <div class="container">
-    <form th:action="@{/bitstamp/{cryptoId}/edit(cryptoId=${paidPriceObject.name})}" th:object="${paidPriceObject}" method="POST">
-        <span th:text="*{value}"></span> = <input type="text" th:field="*{paidPrice}" />
-        <input type="submit" th:value="'Update'" />/<a th:href="@{/bitstamp/delete}">Delete</a>
-    </form>
-    <br/><br/>
+    <table id="dtBasicExample" class="table table-dark">
+        <thead>
+        <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Paid price</th>
+            <th scope="col">Delete</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="deleteList : ${deleteList}">
+            <td th:text="${deleteList.name}"></td>
+            <td th:text="${deleteList.paidPrice}"></td>
+            <td>
+                <span><a th:href="@{/bitstamp/{cryptoId}/delete(cryptoId=${deleteList.name})}">Delete</a></span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 </div>
 <div th:replace="fragments/layout :: footer"></div>
 </body>

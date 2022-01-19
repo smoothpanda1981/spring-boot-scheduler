@@ -132,6 +132,32 @@ public class BitstampController {
         return modelAndView;
     }
 
+    @GetMapping(value = {"/bitstamp/delete"})
+    public ModelAndView showDeleteCryptoId() {
+        List<Balance> deleteList = new ArrayList<Balance>();
+        Properties props = new Properties();
+        try {
+            props.load(new FileInputStream("/home/ywang/bitstamp/bitstampapi.properties"));
+            Set<String> keys = props.stringPropertyNames();
+            for (String key : keys) {
+                if (key.endsWith(".paid.price")) {
+                    System.out.println("key = " + key);
+                    Balance balance = new Balance();
+                    balance.setName(key);
+                    System.out.println("paidPrice = " + props.get(key));
+                    balance.setPaidPrice(props.getProperty(key));
+                    deleteList.add(balance);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            ModelAndView modelAndView = new ModelAndView("bitstamp/delete");
+            modelAndView.addObject("deleteList", deleteList);
+            return modelAndView;
+        }
+    }
+
     @PostMapping(value = {"/bitstamp/{cryptoId}/edit"})
     public String updateCryptoId(@PathVariable String cryptoId, @ModelAttribute("paidPriceObject") Balance balance) {
         try {
@@ -163,6 +189,25 @@ public class BitstampController {
             FileOutputStream out = new FileOutputStream("/tmp/bitstamp/bitstampapi.properties");
             String key = cryptoId.replace("_balance", "") + ".paid.price";
             props.setProperty(key, balance.getPaidPrice());
+            props.store(out, null);
+            out.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            return "redirect:/bitstamp";
+        }
+    }
+
+    @GetMapping(value = {"/bitstamp/{cryptoId}/delete"})
+    public String deleteCryptoId(@PathVariable String cryptoId) {
+        try {
+            FileInputStream in = new FileInputStream("/home/ywang/bitstamp/bitstampapi.properties");
+            Properties props = new Properties();
+            props.load(in);
+            in.close();
+
+            FileOutputStream out = new FileOutputStream("/home/ywang/bitstamp/bitstampapi.properties");
+            props.remove(cryptoId);
             props.store(out, null);
             out.close();
         } catch (FileNotFoundException e) {
