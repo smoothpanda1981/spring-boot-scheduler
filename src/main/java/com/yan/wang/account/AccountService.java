@@ -1,6 +1,9 @@
 package com.yan.wang.account;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Collections;
+import java.util.Properties;
 
 import javax.annotation.PostConstruct;
 
@@ -29,7 +32,14 @@ public class AccountService implements UserDetailsService {
 
 	@PostConstruct	
 	protected void initialize() {
-		save(new Account("ywang", "ouafahwafa79", "ROLE_ADMIN"));
+		Properties props = new Properties();
+		try {
+			props.load(new FileInputStream("/home/ywang/bitstamp/bitstampapi.properties"));
+			save(new Account(props.get("login.username").toString(), props.get("login.password").toString(), "ROLE_ADMIN"));
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Transactional
