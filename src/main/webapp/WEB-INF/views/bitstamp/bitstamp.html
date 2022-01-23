@@ -56,7 +56,7 @@
             <th scope="col">Paid price</th>
             <th scope="col">Current price</th>
             <th scope="col">%</th>
-            <th scope="col">Add/Edit/<a th:href="@{/bitstamp/delete}">Delete</a></th>
+            <th scope="col">Add/Edit/Delete</th>
         </tr>
         </thead>
         <tbody>
@@ -71,12 +71,9 @@
                 <span th:case="'red'" th:style="'color:red'" th:text="${balanceList.priceUpDownPercent}"></span>
                 <span th:case="'green'" th:style="'color:green'" th:text="${balanceList.priceUpDownPercent}"></span>
             </td>
-            <!--            <td th:if="${balanceList.paidPrice != '-'}">-->
-            <!--                <a th:href="@{/bitstamp/{cryptoId}/edit(cryptoId=${balanceList.name})}">Edit</a>-->
-            <!--            </td>-->
             <td th:switch="${balanceList.paidPrice != '-'}">
-                <span th:case="${true}"><a th:href="@{/bitstamp/{cryptoId}/edit(cryptoId=${balanceList.name})}">Edit</a></span>
-                <span th:case="*"><a th:href="@{/bitstamp/{cryptoId}/add(cryptoId=${balanceList.name})}">Add</a></span>
+                <span th:case="${true}">N/A</span>
+                <span th:case="*">N/A</span>
             </td>
         </tr>
         </tbody>
