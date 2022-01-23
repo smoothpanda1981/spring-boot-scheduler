@@ -16,11 +16,14 @@
         <thead>
             <tr>
                 <th scope="col">Name</th>
-                <th scope="col">Value</th>
                 <th scope="col">Portfolio</th>
+                <th scope="col">Value</th>
                 <th scope="col">Paid price</th>
                 <th scope="col">Current price</th>
                 <th scope="col">%</th>
+                <th scope="col">Low (24h)</th>
+                <th scope="col">High (24h)</th>
+                <th scope="col">Volume (24h)</th>
                 <th scope="col">Add/Edit/<a th:href="@{/bitstamp/delete}">Delete</a></th>
             </tr>
         </thead>
@@ -36,6 +39,9 @@
                     <span th:case="'red'" th:style="'color:red'" th:text="${balanceList.priceUpDownPercent}"></span>
                     <span th:case="'green'" th:style="'color:green'" th:text="${balanceList.priceUpDownPercent}"></span>
                 </td>
+                <td th:text="${balanceList.last24Low}"></td>
+                <td th:text="${balanceList.last24High}"></td>
+                <td th:text="${balanceList.last24Volume}"></td>
     <!--            <td th:if="${balanceList.paidPrice != '-'}">-->
     <!--                <a th:href="@{/bitstamp/{cryptoId}/edit(cryptoId=${balanceList.name})}">Edit</a>-->
     <!--            </td>-->
@@ -51,11 +57,14 @@
         <thead>
         <tr>
             <th scope="col">Name</th>
-            <th scope="col">Value</th>
             <th scope="col">Portfolio</th>
+            <th scope="col">Value</th>
             <th scope="col">Paid price</th>
             <th scope="col">Current price</th>
             <th scope="col">%</th>
+            <th scope="col">Low (24h)</th>
+            <th scope="col">High (24h)</th>
+            <th scope="col">Volume (24h)</th>
             <th scope="col">Add/Edit/Delete</th>
         </tr>
         </thead>
@@ -71,6 +80,9 @@
                 <span th:case="'red'" th:style="'color:red'" th:text="${balanceList.priceUpDownPercent}"></span>
                 <span th:case="'green'" th:style="'color:green'" th:text="${balanceList.priceUpDownPercent}"></span>
             </td>
+            <td th:text="${balanceList.last24Low}"></td>
+            <td th:text="${balanceList.last24High}"></td>
+            <td th:text="${balanceList.last24Volume}"></td>
             <td th:switch="${balanceList.paidPrice != '-'}">
                 <span th:case="${true}">N/A</span>
                 <span th:case="*">N/A</span>

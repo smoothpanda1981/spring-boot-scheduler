@@ -16,6 +16,12 @@ public class Balance {
 
 	private String portfolioName;
 
+	private String last24High;
+
+	private String last24Low;
+
+	private String last24Volume;
+
 	public String getName() {
 		return name;
 	}
@@ -70,5 +76,29 @@ public class Balance {
 
 	public void setPortfolioName(String portfolioName) {
 		this.portfolioName = portfolioName;
+	}
+
+	public String getLast24High() {
+		return last24High;
+	}
+
+	public void setLast24High(String last24High) {
+		this.last24High = last24High;
+	}
+
+	public String getLast24Low() {
+		return last24Low;
+	}
+
+	public void setLast24Low(String last24Low) {
+		this.last24Low = last24Low;
+	}
+
+	public String getLast24Volume() {
+		return last24Volume;
+	}
+
+	public void setLast24Volume(String last24Volume) {
+		this.last24Volume = last24Volume;
 	}
 }

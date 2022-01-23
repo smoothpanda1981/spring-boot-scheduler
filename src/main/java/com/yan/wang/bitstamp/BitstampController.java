@@ -1,13 +1,8 @@
 package com.yan.wang.bitstamp;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yan.wang.findata.BuySellBtcUsd;
-import com.yan.wang.findata.BuySellBtcUsdService;
 import org.apache.commons.codec.binary.Hex;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -62,10 +57,17 @@ public class BitstampController {
                     Balance balance2 = new Balance();
                     balance2.setName(balance.getName());
                     balance2.setValue(balance.getValue());
-                    balance2.setCurrentPrice(getCurrentPrice(balance));
+                    Ticker ticker = getTicker(balance);
+                    balance2.setCurrentPrice(ticker.getLast());
+                    balance2.setLast24Low(ticker.getLow());
+                    balance2.setLast24High(ticker.getHigh());
+                    balance2.setLast24Volume(ticker.getVolume());
                     balanceList2.add(balance2);
                 } else {
                     balance.setCurrentPrice("-");
+                    balance.setLast24Low("-");
+                    balance.setLast24High("-");
+                    balance.setLast24Volume("-");
                     balanceList2.add(balance);
                 }
             }
@@ -76,6 +78,9 @@ public class BitstampController {
                 balance3.setName(balance.getName());
                 balance3.setValue(balance.getValue());
                 balance3.setCurrentPrice(balance.getCurrentPrice());
+                balance3.setLast24Low(balance.getLast24Low());
+                balance3.setLast24High(balance.getLast24High());
+                balance3.setLast24Volume(balance.getLast24Volume());
                 balance3.setPaidPrice(getPaidPrice(props, balance.getName()));
                 balanceList3.add(balance3);
             }
@@ -86,6 +91,9 @@ public class BitstampController {
                 balance4.setName(balance.getName());
                 balance4.setValue(balance.getValue());
                 balance4.setCurrentPrice(balance.getCurrentPrice());
+                balance4.setLast24Low(balance.getLast24Low());
+                balance4.setLast24High(balance.getLast24High());
+                balance4.setLast24Volume(balance.getLast24Volume());
                 balance4.setPaidPrice(balance.getPaidPrice());
                 balance4.setProfitOrLoss(computeProfitOrLossCurrentPrice(balance.getCurrentPrice(), balance.getPaidPrice()));
                 balance4.setPriceUpDownPercent(computeUpDownPercentage(balance.getPaidPrice(), balance.getCurrentPrice()));
@@ -108,6 +116,9 @@ public class BitstampController {
                         balance.setValue(value);
                         balance.setPaidPrice("-");
                         balance.setCurrentPrice("-");
+                        balance.setLast24Low("-");
+                        balance.setLast24High("-");
+                        balance.setLast24Volume("-");
                         balance.setProfitOrLoss(computeProfitOrLossCurrentPrice(balance.getCurrentPrice(), balance.getPaidPrice()));
                         balance.setPriceUpDownPercent(computeUpDownPercentage(balance.getPaidPrice(), balance.getCurrentPrice()));
                         balance.setPortfolioName("Profits");
@@ -120,8 +131,19 @@ public class BitstampController {
             for (Balance balance : balanceList4) {
                 Balance balance5 = new Balance();
                 balance5.setName(balance.getName());
-                balance5.setValue(balance.getValue());
+
+                Double doubleValue1 = Double.parseDouble(balance.getValue());
+                balance5.setValue(String.format("%.3f", doubleValue1));
+
                 balance5.setCurrentPrice(balance.getCurrentPrice());
+                balance5.setLast24Low(balance.getLast24Low());
+                balance5.setLast24High(balance.getLast24High());
+
+
+                String[] tab = new String[2];
+                tab = balance.getLast24Volume().split("\\.");
+                balance5.setLast24Volume(tab[0]);
+
                 balance5.setPaidPrice(balance.getPaidPrice());
                 balance5.setProfitOrLoss(balance.getProfitOrLoss());
                 balance5.setPriceUpDownPercent(balance.getPriceUpDownPercent());
@@ -382,7 +404,7 @@ public class BitstampController {
         return response.body();
     }
 
-    private String getCurrentPrice(Balance balance) throws IOException {
+    private Ticker getTicker(Balance balance) throws IOException {
         // Create a neat value object to hold the URL
         String crypto = balance.getName().replace("_balance", "");
         String composeUrl = "https://www.bitstamp.net/api/v2/ticker/" + crypto + "usd/";
@@ -399,10 +421,10 @@ public class BitstampController {
 
         // Manually converting the response body InputStream to CurrentPrice using Jackson
         ObjectMapper mapper = new ObjectMapper();
-        CurrentPrice currentPrice = mapper.readValue(responseStream, CurrentPrice.class);
+        Ticker ticker = mapper.readValue(responseStream, Ticker.class);
 
         // Finally we have the response
-        return currentPrice.getLast();
+        return ticker;
 
     }
 

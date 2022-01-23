@@ -1,6 +1,6 @@
 package com.yan.wang.bitstamp;
 
-public class CurrentPrice {
+public class Ticker {
 
 	public String high;
 	public String last;
