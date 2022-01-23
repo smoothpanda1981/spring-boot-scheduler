@@ -14,6 +14,8 @@ public class Balance {
 
 	private String priceUpDownPercent;
 
+	private String portfolioName;
+
 	public String getName() {
 		return name;
 	}
@@ -60,5 +62,13 @@ public class Balance {
 
 	public void setPriceUpDownPercent(String priceUpDownPercent) {
 		this.priceUpDownPercent = priceUpDownPercent;
+	}
+
+	public String getPortfolioName() {
+		return portfolioName;
+	}
+
+	public void setPortfolioName(String portfolioName) {
+		this.portfolioName = portfolioName;
 	}
 }

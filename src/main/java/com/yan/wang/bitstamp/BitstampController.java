@@ -35,7 +35,7 @@ public class BitstampController {
             Properties props = new Properties();
             props.load(new FileInputStream("/home/ywang/bitstamp/bitstampapi.properties"));
 
-            String result = getBalance(props).replace(" ", "");
+            String result = getMainBalance(props).replace(" ", "");
 
             String subResult = result.substring(1, result.length()-1);
             String str[] = subResult.split(",");
@@ -89,11 +89,54 @@ public class BitstampController {
                 balance4.setPaidPrice(balance.getPaidPrice());
                 balance4.setProfitOrLoss(computeProfitOrLossCurrentPrice(balance.getCurrentPrice(), balance.getPaidPrice()));
                 balance4.setPriceUpDownPercent(computeUpDownPercentage(balance.getPaidPrice(), balance.getCurrentPrice()));
+                balance4.setPortfolioName("Main");
                 balanceList4.add(balance4);
             }
 
+            String result2 = getProfitsBalance(props).replace(" ", "");
+            String subResult2 = result2.substring(1, result2.length()-1);
+            String str2[] = subResult2.split(",");
+            List<String> arrayList2 = new ArrayList<String>();
+            arrayList2 = Arrays.asList(str2);
+            for (String s : arrayList2) {
+                String tab[] = s.split(":");
+                String name = tab[0].substring(1, tab[0].length()-1);
+                String value = tab[1].substring(1, tab[1].length()-1);
+                if (name.equals("eur_balance") || name.equals("usd_balance")) {
+                        Balance balance = new Balance();
+                        balance.setName(name);
+                        balance.setValue(value);
+                        balance.setPaidPrice("-");
+                        balance.setCurrentPrice("-");
+                        balance.setProfitOrLoss(computeProfitOrLossCurrentPrice(balance.getCurrentPrice(), balance.getPaidPrice()));
+                        balance.setPriceUpDownPercent(computeUpDownPercentage(balance.getPaidPrice(), balance.getCurrentPrice()));
+                        balance.setPortfolioName("Profits");
+                        balanceList4.add(balance);
+                }
+            }
+
+            List<Balance> balanceList5 = new ArrayList<Balance>();
+            List<Balance> balanceList6 = new ArrayList<Balance>();
+            for (Balance balance : balanceList4) {
+                Balance balance5 = new Balance();
+                balance5.setName(balance.getName());
+                balance5.setValue(balance.getValue());
+                balance5.setCurrentPrice(balance.getCurrentPrice());
+                balance5.setPaidPrice(balance.getPaidPrice());
+                balance5.setProfitOrLoss(balance.getProfitOrLoss());
+                balance5.setPriceUpDownPercent(balance.getPriceUpDownPercent());
+                balance5.setPortfolioName(balance.getPortfolioName());
+
+                if (balance.getName().startsWith("usd_") || balance.getName().startsWith("eur_")) {
+                    balanceList6.add(balance5);
+                } else {
+                    balanceList5.add(balance5);
+                }
+            }
+
             ModelAndView modelAndView = new ModelAndView("bitstamp/bitstamp");
-            modelAndView.addObject("balanceList", balanceList4);
+            modelAndView.addObject("balanceList5", balanceList5);
+            modelAndView.addObject("balanceList6", balanceList6);
             return modelAndView;
 
         } catch (Exception e) {
@@ -217,9 +260,9 @@ public class BitstampController {
         }
     }
 
-    private String getBalance(Properties props) throws NoSuchAlgorithmException, InvalidKeyException, IOException, InterruptedException {
-        String apiKey = String.format("%s %s", "BITSTAMP", props.getProperty("api.key"));
-        String apiKeySecret = props.getProperty("api.secret");
+    private String getMainBalance(Properties props) throws NoSuchAlgorithmException, InvalidKeyException, IOException, InterruptedException {
+        String apiKey = String.format("%s %s", "BITSTAMP", props.getProperty("main.api.key"));
+        String apiKeySecret = props.getProperty("main.api.secret");
         String httpVerb = "POST";
         String urlHost = "www.bitstamp.net";
         String urlPath = "/api/v2/balance/";
@@ -275,7 +318,67 @@ public class BitstampController {
         if (!newSignature.equals(serverSignature)) {
             throw new RuntimeException("Signatures do not match");
         }
+        return response.body();
+    }
 
+    private String getProfitsBalance(Properties props) throws NoSuchAlgorithmException, InvalidKeyException, IOException, InterruptedException {
+        String apiKey = String.format("%s %s", "BITSTAMP", props.getProperty("profits.api.key"));
+        String apiKeySecret = props.getProperty("profits.api.secret");
+        String httpVerb = "POST";
+        String urlHost = "www.bitstamp.net";
+        String urlPath = "/api/v2/balance/";
+        String urlQuery = "";
+        String timestamp = String.valueOf(System.currentTimeMillis());
+        String nonce = UUID.randomUUID().toString();
+        String contentType = "application/x-www-form-urlencoded";
+        String version = "v2";
+        String payloadString = "offset=1";
+        String signature = apiKey +
+                httpVerb +
+                urlHost +
+                urlPath +
+                urlQuery +
+                contentType +
+                nonce +
+                timestamp +
+                version +
+                payloadString;
+
+        SecretKeySpec secretKey = new SecretKeySpec(apiKeySecret.getBytes(), "HmacSHA256");
+        Mac mac = Mac.getInstance("HmacSHA256");
+        mac.init(secretKey);
+        byte[] rawHmac = mac.doFinal(signature.getBytes());
+        signature = new String(Hex.encodeHex(rawHmac)).toUpperCase();
+
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("https://www.bitstamp.net/api/v2/balance/"))
+                .POST(HttpRequest.BodyPublishers.ofString(payloadString))
+                .setHeader("X-Auth", apiKey)
+                .setHeader("X-Auth-Signature", signature)
+                .setHeader("X-Auth-Nonce", nonce)
+                .setHeader("X-Auth-Timestamp", timestamp)
+                .setHeader("X-Auth-Version", version)
+                .setHeader("Content-Type", contentType)
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() != 200) {
+            throw new RuntimeException("Status code not 200");
+        }
+
+        String serverSignature = response.headers().map().get("x-server-auth-signature").get(0);
+        String responseContentType = response.headers().map().get("Content-Type").get(0);
+        String stringToSign = nonce + timestamp + responseContentType + response.body();
+
+        mac.init(secretKey);
+        byte[] rawHmacServerCheck = mac.doFinal(stringToSign.getBytes());
+        String newSignature = new String(Hex.encodeHex(rawHmacServerCheck));
+
+        if (!newSignature.equals(serverSignature)) {
+            throw new RuntimeException("Signatures do not match");
+        }
         return response.body();
     }
 
