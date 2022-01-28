@@ -95,7 +95,9 @@ public class BitstampController {
                 balance4.setLast24High(balance.getLast24High());
                 balance4.setLast24Volume(balance.getLast24Volume());
                 balance4.setPaidPrice(balance.getPaidPrice());
-                balance4.setProfitOrLoss(computeProfitOrLossCurrentPrice(balance.getCurrentPrice(), balance.getPaidPrice()));
+                balance4.setAmountSpendToBuy(computeAmountSpendToBuy(balance.getValue(), balance.getPaidPrice()));
+                balance4.setProfitOrLossValue(computeProfitOrLossAsValue(balance.getPaidPrice(), balance.getCurrentPrice(), balance.getValue()));
+                balance4.setProfitOrLossPercentage(computeProfitOrLossCurrentPrice(balance.getCurrentPrice(), balance.getPaidPrice()));
                 balance4.setPriceUpDownPercent(computeUpDownPercentage(balance.getPaidPrice(), balance.getCurrentPrice()));
                 balance4.setPortfolioName("Main");
                 balanceList4.add(balance4);
@@ -119,8 +121,10 @@ public class BitstampController {
                         balance.setLast24Low("-");
                         balance.setLast24High("-");
                         balance.setLast24Volume("-");
-                        balance.setProfitOrLoss(computeProfitOrLossCurrentPrice(balance.getCurrentPrice(), balance.getPaidPrice()));
-                        balance.setPriceUpDownPercent(computeUpDownPercentage(balance.getPaidPrice(), balance.getCurrentPrice()));
+                        balance.setAmountSpendToBuy("-");
+                        balance.setProfitOrLossValue("-");
+                        balance.setProfitOrLossPercentage("-");
+                        balance.setPriceUpDownPercent("-");
                         balance.setPortfolioName("Profits");
                         balanceList4.add(balance);
                 }
@@ -145,7 +149,9 @@ public class BitstampController {
                 balance5.setLast24Volume(tab[0]);
 
                 balance5.setPaidPrice(balance.getPaidPrice());
-                balance5.setProfitOrLoss(balance.getProfitOrLoss());
+                balance5.setAmountSpendToBuy(balance.getAmountSpendToBuy());
+                balance5.setProfitOrLossValue(balance.getProfitOrLossValue());
+                balance5.setProfitOrLossPercentage(balance.getProfitOrLossPercentage());
                 balance5.setPriceUpDownPercent(balance.getPriceUpDownPercent());
                 balance5.setPortfolioName(balance.getPortfolioName());
 
@@ -436,6 +442,85 @@ public class BitstampController {
             result = props.getProperty(crypto+keySecondPart);
         } else {
             result = "-";
+        }
+        return result;
+    }
+
+    private String computeAmountSpendToBuy(String quantity, String paidPrice) {
+        String result;
+        if (paidPrice.equals("-")) {
+            result = "-";
+        } else if (paidPrice.contains(",")) {
+            String[] tab = paidPrice.split(",");
+            Double[] tabD = new Double[tab.length];
+            for (int i = 0; i < tab.length; i++) {
+                tabD[i] = Double.parseDouble(tab[i]);
+            }
+
+            double maxPaidPriceD = tabD[0];
+            for (int counter = 1; counter < tabD.length; counter++) {
+                if (tabD[counter] > maxPaidPriceD) {
+                    maxPaidPriceD = tabD[counter];
+                }
+            }
+            double quantityD = Double.parseDouble(quantity);
+
+            double temp = quantityD * maxPaidPriceD;
+            DecimalFormat df = new DecimalFormat("0.00");
+            result = df.format(temp);
+        } else {
+            double paidPriceD = Double.parseDouble(paidPrice);
+            double quantityD = Double.parseDouble(quantity);
+
+            double temp = quantityD * paidPriceD;
+            DecimalFormat df = new DecimalFormat("0.00");
+            result = df.format(temp);
+        }
+        return result;
+    }
+
+    private String computeProfitOrLossAsValue(String paidPrice, String currentPrice, String quantity) {
+        String result;
+        double quantityD = Double.parseDouble(quantity);
+        double totalMaxPaidPriceQuantity, totalCurrentPriceQuantity;
+        if (paidPrice.equals("-")) {
+            result = "-";
+        } else if (paidPrice.contains(",")) {
+            String[] tab = paidPrice.split(",");
+            Double[] tabD = new Double[tab.length];
+            for (int i = 0; i < tab.length; i++) {
+                tabD[i] = Double.parseDouble(tab[i]);
+            }
+
+            double maxPaidPriceD = tabD[0];
+            for (int counter = 1; counter < tabD.length; counter++) {
+                if (tabD[counter] > maxPaidPriceD) {
+                    maxPaidPriceD = tabD[counter];
+                }
+            }
+
+            double currentPriceD = Double.parseDouble(currentPrice);
+            totalMaxPaidPriceQuantity = maxPaidPriceD * quantityD;
+            totalCurrentPriceQuantity = currentPriceD * quantityD;
+
+            double temp = totalCurrentPriceQuantity - totalMaxPaidPriceQuantity;
+            DecimalFormat df = new DecimalFormat("0.00");
+            result = df.format(temp);
+            if (!result.startsWith("-")) {
+                result = "+" + result;
+            }
+        } else {
+            double currentPriceD = Double.parseDouble(currentPrice);
+            double paidPriceD = Double.parseDouble(paidPrice);
+            totalMaxPaidPriceQuantity = paidPriceD * quantityD;
+            totalCurrentPriceQuantity = currentPriceD * quantityD;
+
+            double temp = totalCurrentPriceQuantity - totalMaxPaidPriceQuantity;
+            DecimalFormat df = new DecimalFormat("0.00");
+            result = df.format(temp);
+            if (!result.startsWith("-")) {
+                result = "+" + result;
+            }
         }
         return result;
     }

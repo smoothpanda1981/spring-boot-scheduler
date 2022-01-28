@@ -21,6 +21,8 @@
                 <th scope="col">Paid price</th>
                 <th scope="col">Current price</th>
                 <th scope="col">%</th>
+                <th scope="col">Cost</th>
+                <th scope="col">P/L</th>
                 <th scope="col">Low (24h)</th>
                 <th scope="col">High (24h)</th>
                 <th scope="col">Volume (24h)</th>
@@ -34,10 +36,16 @@
                 <td th:text="${balanceList.value}"></td>
                 <td th:text="${balanceList.paidPrice}"></td>
                 <td th:text="${balanceList.currentPrice}"></td>
-                <td th:switch="${balanceList.profitOrLoss}">
+                <td th:switch="${balanceList.profitOrLossPercentage}">
                     <span th:case="'black'" th:text="${balanceList.priceUpDownPercent}"></span>
                     <span th:case="'red'" th:style="'color:red'" th:text="${balanceList.priceUpDownPercent}"></span>
                     <span th:case="'green'" th:style="'color:green'" th:text="${balanceList.priceUpDownPercent}"></span>
+                </td>
+                <td th:text="${balanceList.amountSpendToBuy}"></td>
+                <td th:switch="${balanceList.profitOrLossPercentage}">
+                    <span th:case="'black'" th:text="${balanceList.profitOrLossValue}"></span>
+                    <span th:case="'red'" th:style="'color:red'" th:text="${balanceList.profitOrLossValue}"></span>
+                    <span th:case="'green'" th:style="'color:green'" th:text="${balanceList.profitOrLossValue}"></span>
                 </td>
                 <td th:text="${balanceList.last24Low}"></td>
                 <td th:text="${balanceList.last24High}"></td>
@@ -62,6 +70,8 @@
             <th scope="col">Paid price</th>
             <th scope="col">Current price</th>
             <th scope="col">%</th>
+            <th scope="col">Cost</th>
+            <th scope="col">P/L</th>
             <th scope="col">Low (24h)</th>
             <th scope="col">High (24h)</th>
             <th scope="col">Volume (24h)</th>
@@ -75,10 +85,16 @@
             <td th:text="${balanceList.value}"></td>
             <td th:text="${balanceList.paidPrice}"></td>
             <td th:text="${balanceList.currentPrice}"></td>
-            <td th:switch="${balanceList.profitOrLoss}">
+            <td th:switch="${balanceList.profitOrLossPercentage}">
                 <span th:case="'black'" th:text="${balanceList.priceUpDownPercent}"></span>
                 <span th:case="'red'" th:style="'color:red'" th:text="${balanceList.priceUpDownPercent}"></span>
                 <span th:case="'green'" th:style="'color:green'" th:text="${balanceList.priceUpDownPercent}"></span>
+            </td>
+            <td th:text="${balanceList.amountSpendToBuy}"></td>
+            <td th:switch="${balanceList.profitOrLossPercentage}">
+                <span th:case="'black'" th:text="${balanceList.profitOrLossValue}"></span>
+                <span th:case="'red'" th:style="'color:red'" th:text="${balanceList.profitOrLossValue}"></span>
+                <span th:case="'green'" th:style="'color:green'" th:text="${balanceList.profitOrLossValue}"></span>
             </td>
             <td th:text="${balanceList.last24Low}"></td>
             <td th:text="${balanceList.last24High}"></td>

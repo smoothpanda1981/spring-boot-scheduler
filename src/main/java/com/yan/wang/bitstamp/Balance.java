@@ -10,7 +10,11 @@ public class Balance {
 
 	private String currentPrice;
 
-	private String profitOrLoss;
+	private String amountSpendToBuy;
+
+	private String profitOrLossValue;
+
+	private String profitOrLossPercentage;
 
 	private String priceUpDownPercent;
 
@@ -54,12 +58,28 @@ public class Balance {
 		this.paidPrice = paidPrice;
 	}
 
-	public String getProfitOrLoss() {
-		return profitOrLoss;
+	public String getAmountSpendToBuy() {
+		return amountSpendToBuy;
 	}
 
-	public void setProfitOrLoss(String profitOrLoss) {
-		this.profitOrLoss = profitOrLoss;
+	public void setAmountSpendToBuy(String amountSpendToBuy) {
+		this.amountSpendToBuy = amountSpendToBuy;
+	}
+
+	public String getProfitOrLossValue() {
+		return profitOrLossValue;
+	}
+
+	public void setProfitOrLossValue(String profitOrLossValue) {
+		this.profitOrLossValue = profitOrLossValue;
+	}
+
+	public String getProfitOrLossPercentage() {
+		return profitOrLossPercentage;
+	}
+
+	public void setProfitOrLossPercentage(String profitOrLossPercentage) {
+		this.profitOrLossPercentage = profitOrLossPercentage;
 	}
 
 	public String getPriceUpDownPercent() {
