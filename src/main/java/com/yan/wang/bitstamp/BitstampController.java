@@ -248,6 +248,12 @@ public class BitstampController {
                 }
             }
 
+            for (UserTransaction userTransaction : sortedUserTransactionList) {
+                String crypto = userTransaction.getCryptoUsdName().replace("_", "");
+                Ticker ticker = getTicker(crypto);
+                userTransaction.setCurrentPrice(ticker.getLast());
+            }
+
             ModelAndView modelAndView = new ModelAndView("bitstamp/bitstamp");
             modelAndView.addObject("balanceList5", balanceList5);
             modelAndView.addObject("balanceList6", balanceList6);
@@ -576,6 +582,29 @@ public class BitstampController {
         // Create a neat value object to hold the URL
         String crypto = balance.getName().replace("_balance", "");
         String composeUrl = "https://www.bitstamp.net/api/v2/ticker/" + crypto + "usd/";
+        URL url = new URL(composeUrl);
+
+        // Open a connection(?) on the URL(??) and cast the response(???)
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+        // Now it's "open", we can set the request method, headers etc.
+        connection.setRequestProperty("accept", "application/json");
+
+        // This line makes the request
+        InputStream responseStream = connection.getInputStream();
+
+        // Manually converting the response body InputStream to CurrentPrice using Jackson
+        ObjectMapper mapper = new ObjectMapper();
+        Ticker ticker = mapper.readValue(responseStream, Ticker.class);
+
+        // Finally we have the response
+        return ticker;
+
+    }
+
+    private Ticker getTicker(String crypto) throws IOException {
+        // Create a neat value object to hold the URL
+        String composeUrl = "https://www.bitstamp.net/api/v2/ticker/" + crypto + "/";
         URL url = new URL(composeUrl);
 
         // Open a connection(?) on the URL(??) and cast the response(???)

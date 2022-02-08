@@ -77,13 +77,14 @@
         </tr>
         </tbody>
     </table>
-    <h1>Last sold cryptocurrencies</h1>
+    <h1>Last Sold Cryptocurrencies</h1>
     <table id="dtBasicExample3" class="table table-dark">
         <thead>
         <tr>
             <th scope="col">Date</th>
             <th scope="col">Name</th>
             <th scope="col">Sold Price</th>
+            <th scope="col">Current Price</th>
             <th scope="col">Amount</th>
             <th scope="col">Total</th>
             <th scope="col">Fee</th>
@@ -94,6 +95,7 @@
             <td th:text="${balanceList.datetime}"></td>
             <td th:text="${balanceList.cryptoUsdName}"></td>
             <td th:text="${balanceList.cryptoUsd}"></td>
+            <td th:text="${balanceList.currentPrice}"></td>
             <td th:text="${balanceList.cryptoAmount}"></td>
             <td th:text="${balanceList.usd}"></td>
             <td th:text="${balanceList.fee}"></td>

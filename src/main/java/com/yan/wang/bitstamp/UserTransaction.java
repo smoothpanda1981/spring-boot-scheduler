@@ -13,6 +13,7 @@ public class UserTransaction {
     private String type;
     private String id;
     private String eur;
+    private String currentPrice;
 
     public String getUsd() {
         return usd;
@@ -108,5 +109,13 @@ public class UserTransaction {
 
     public void setCryptoAmountName(String cryptoAmountName) {
         this.cryptoAmountName = cryptoAmountName;
+    }
+
+    public String getCurrentPrice() {
+        return currentPrice;
+    }
+
+    public void setCurrentPrice(String currentPrice) {
+        this.currentPrice = currentPrice;
     }
 }
