@@ -29,7 +29,6 @@ public class BitstampController {
         try {
             Properties props = new Properties();
             props.load(new FileInputStream("/home/ywang/bitstamp/bitstampapi.properties"));
-
             String result = getMainBalance(props).replace(" ", "");
 
             String subResult = result.substring(1, result.length()-1);
@@ -162,9 +161,97 @@ public class BitstampController {
                 }
             }
 
+
+            List<UserTransaction> userTransactionList = new ArrayList<UserTransaction>();
+            String resultTemp = getUserTransactions(props).replace(" ", "");
+            String resultSub = resultTemp.substring(2, resultTemp.length()-2);
+            String[] resultSubTab = resultSub.split("\\},\\{");
+            for (int i = 0; i < resultSubTab.length; i++) {
+                if (resultSubTab[i].contains("\"type\":\"2\"") && resultSubTab[i].contains("\"order_id\"") && resultSubTab[i].contains("\"fee\"") && resultSubTab[i].contains("\"usd\"")) {
+                    String[] oneRowTab = resultSubTab[i].split(",");
+                    boolean show = false;
+                    for (int j = 0; j < oneRowTab.length; j++) {
+                        if (oneRowTab[j].startsWith("\"usd\":\"")) {
+                            String[] subString = oneRowTab[j].split(":");
+                            String value = subString[1].substring(1, subString[1].length()-1);
+                            Double d = Double.parseDouble(value);
+                            if (d > 0) {
+                                show = true;
+                            }
+                        }
+                    }
+                    if (show) {
+                        UserTransaction userTransaction = new UserTransaction();
+                        String userTransactionString = resultSubTab[i];
+                        String[] userTransactionTab = userTransactionString.split(",");
+                        for (int k = 0; k < userTransactionTab.length; k++) {
+                            boolean goToElse = true;
+                            String userTransactionObj = userTransactionTab[k];
+                            String[] userTransactionObjTab = userTransactionObj.split(":");
+                            if (userTransactionObjTab[0].equals("\"usd\"")) {
+                                Double usd = Double.parseDouble(userTransactionObjTab[1].substring(1, userTransactionObjTab[1].length()-1));
+                                DecimalFormat df = new DecimalFormat("0.00");
+                                userTransaction.setUsd(df.format(usd));
+                            } else if (userTransactionObjTab[0].equals("\"order_i d\"")) {
+                                userTransaction.setOrderId(userTransactionObjTab[1]);
+                            } else if (userTransactionObjTab[0].contains("_usd")) {
+                                Double cryptoUsd = Double.parseDouble(userTransactionObjTab[1]);
+                                userTransaction.setCryptoUsd(String.format("%.5f", cryptoUsd));
+                                userTransaction.setCryptoUsdName(userTransactionObjTab[0].substring(1, userTransactionObjTab[0].length()-1));
+                            } else if (userTransactionObjTab[0].equals("\"datetime\"")) {
+                                userTransaction.setDatetime(userTransactionObjTab[1].substring(1, userTransactionObjTab[1].length()-2));
+                            } else if (userTransactionObjTab[0].equals("\"fee\"")) {
+                                Double fee = Double.parseDouble(userTransactionObjTab[1].substring(1, userTransactionObjTab[1].length()-1));
+                                DecimalFormat df = new DecimalFormat("0.00");
+                                userTransaction.setFee(df.format(fee));
+                            } else if (userTransactionObjTab[0].equals("\"btc\"")) {
+                                userTransaction.setBtc(userTransactionObjTab[1]);
+                                if (!userTransactionObjTab[1].equals("0.0")) {
+                                    goToElse = false;
+                                    Double cryptoAmount = Double.parseDouble(userTransactionObjTab[1].substring(1, userTransactionObjTab[1].length()-1));
+                                    userTransaction.setCryptoAmount(String.format("%.4f", cryptoAmount));
+                                    userTransaction.setCryptoAmountName(userTransactionObjTab[0].substring(1, userTransactionObjTab[0].length()-1));
+                                }
+                            } else if (userTransactionObjTab[0].equals("\"type\"")) {
+                                userTransaction.setType(userTransactionObjTab[1].substring(1, userTransactionObjTab[1].length()-1));
+                            } else if (userTransactionObjTab[0].equals("\"id\"")) {
+                                userTransaction.setId(userTransactionObjTab[1]);
+                            } else if (userTransactionObjTab[0].equals("\"eur\"")) {
+                                userTransaction.setEur(userTransactionObjTab[1]);
+                            } else {
+                                if (goToElse) {
+                                    Double cryptoAmount = Double.parseDouble(userTransactionObjTab[1].substring(1, userTransactionObjTab[1].length()-1));
+                                    userTransaction.setCryptoAmount(String.format("%.4f", cryptoAmount));
+                                    userTransaction.setCryptoAmountName(userTransactionObjTab[0].substring(1, userTransactionObjTab[0].length()-1));
+                                }
+                            }
+                        }
+                        userTransactionList.add(userTransaction);
+                    }
+                }
+            }
+
+            Set<String> cryptoNameSet = new HashSet<String>();
+            for (UserTransaction userTransaction : userTransactionList) {
+                String key = userTransaction.getCryptoUsdName();
+                if (!cryptoNameSet.contains(key)) {
+                    cryptoNameSet.add(key);
+                }
+            }
+
+            List<UserTransaction> sortedUserTransactionList = new ArrayList<UserTransaction>();
+            for (UserTransaction userTransaction : userTransactionList) {
+                String cryptoUsdName = userTransaction.getCryptoUsdName();
+                if (cryptoNameSet.contains(cryptoUsdName)) {
+                    sortedUserTransactionList.add(userTransaction);
+                    cryptoNameSet.remove(cryptoUsdName);
+                }
+            }
+
             ModelAndView modelAndView = new ModelAndView("bitstamp/bitstamp");
             modelAndView.addObject("balanceList5", balanceList5);
             modelAndView.addObject("balanceList6", balanceList6);
+            modelAndView.addObject("balanceList7", sortedUserTransactionList);
             return modelAndView;
 
         } catch (Exception e) {
@@ -288,18 +375,18 @@ public class BitstampController {
         }
     }
 
-    private String getMainBalance(Properties props) throws NoSuchAlgorithmException, InvalidKeyException, IOException, InterruptedException {
+    private String getUserTransactions(Properties props) throws NoSuchAlgorithmException, InvalidKeyException, IOException, InterruptedException {
         String apiKey = String.format("%s %s", "BITSTAMP", props.getProperty("main.api.key"));
         String apiKeySecret = props.getProperty("main.api.secret");
         String httpVerb = "POST";
         String urlHost = "www.bitstamp.net";
-        String urlPath = "/api/v2/balance/";
+        String urlPath = "/api/v2/user_transactions/";
         String urlQuery = "";
         String timestamp = String.valueOf(System.currentTimeMillis());
         String nonce = UUID.randomUUID().toString();
         String contentType = "application/x-www-form-urlencoded";
         String version = "v2";
-        String payloadString = "offset=1";
+        String payloadString = "offset=0;limit=1000";
         String signature = apiKey +
                 httpVerb +
                 urlHost +
@@ -319,7 +406,7 @@ public class BitstampController {
 
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://www.bitstamp.net/api/v2/balance/"))
+                .uri(URI.create("https://www.bitstamp.net/api/v2/user_transactions/"))
                 .POST(HttpRequest.BodyPublishers.ofString(payloadString))
                 .setHeader("X-Auth", apiKey)
                 .setHeader("X-Auth-Signature", signature)
@@ -346,6 +433,81 @@ public class BitstampController {
         if (!newSignature.equals(serverSignature)) {
             throw new RuntimeException("Signatures do not match");
         }
+        return response.body();
+    }
+
+    private String getMainBalance(Properties props) {
+        HttpResponse<String> response = null;
+
+        try {
+            String apiKey = String.format("%s %s", "BITSTAMP", props.getProperty("main.api.key"));
+            String apiKeySecret = props.getProperty("main.api.secret");
+            String httpVerb = "POST";
+            String urlHost = "www.bitstamp.net";
+            String urlPath = "/api/v2/balance/";
+            String urlQuery = "";
+            String timestamp = String.valueOf(System.currentTimeMillis());
+            String nonce = UUID.randomUUID().toString();
+            String contentType = "application/x-www-form-urlencoded";
+            String version = "v2";
+            String payloadString = "offset=1";
+            String signature = apiKey +
+                    httpVerb +
+                    urlHost +
+                    urlPath +
+                    urlQuery +
+                    contentType +
+                    nonce +
+                    timestamp +
+                    version +
+                    payloadString;
+
+            SecretKeySpec secretKey = new SecretKeySpec(apiKeySecret.getBytes(), "HmacSHA256");
+            Mac mac = Mac.getInstance("HmacSHA256");
+
+            mac.init(secretKey);
+            byte[] rawHmac = mac.doFinal(signature.getBytes());
+            signature = new String(Hex.encodeHex(rawHmac)).toUpperCase();
+
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create("https://www.bitstamp.net/api/v2/balance/"))
+                    .POST(HttpRequest.BodyPublishers.ofString(payloadString))
+                    .setHeader("X-Auth", apiKey)
+                    .setHeader("X-Auth-Signature", signature)
+                    .setHeader("X-Auth-Nonce", nonce)
+                    .setHeader("X-Auth-Timestamp", timestamp)
+                    .setHeader("X-Auth-Version", version)
+                    .setHeader("Content-Type", contentType)
+                    .build();
+
+            response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() != 200) {
+                throw new RuntimeException("Status code not 200");
+            }
+
+            String serverSignature = response.headers().map().get("x-server-auth-signature").get(0);
+            String responseContentType = response.headers().map().get("Content-Type").get(0);
+            String stringToSign = nonce + timestamp + responseContentType + response.body();
+
+            mac.init(secretKey);
+            byte[] rawHmacServerCheck = mac.doFinal(stringToSign.getBytes());
+            String newSignature = new String(Hex.encodeHex(rawHmacServerCheck));
+
+            if (!newSignature.equals(serverSignature)) {
+                throw new RuntimeException("Signatures do not match");
+            }
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         return response.body();
     }
 
