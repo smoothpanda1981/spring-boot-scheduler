@@ -27,7 +27,6 @@ public class BitstampRepositoryImpl implements BitstampRepository {
     @Override
     @Transactional
     public Integer getPagination() {
-        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         Integer page = entityManager.createQuery("select max(b.pagination) from Balance b", Integer.class).getSingleResult();
         if (page == null) {
             page = 1;
@@ -36,4 +35,13 @@ public class BitstampRepositoryImpl implements BitstampRepository {
         }
         return page;
     }
+
+    @Override
+    @Transactional
+    public List<Balance> getBalanceListByPagination(Integer pageId) {
+        List<Balance> balanceListByPagination = entityManager.createQuery("from Balance b where b.pagination = " + pageId, Balance.class).getResultList();
+        return balanceListByPagination;
+    }
+
+
 }

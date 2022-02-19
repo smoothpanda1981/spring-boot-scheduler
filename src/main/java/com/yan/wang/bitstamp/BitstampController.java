@@ -276,7 +276,8 @@ public class BitstampController {
             modelAndView.addObject("balanceList5", balanceList5);
             modelAndView.addObject("balanceList6", balanceList6);
             modelAndView.addObject("balanceList7", sortedUserTransactionList);
-            System.out.println("test push jenkins");
+            Integer paginationMinusOne = pagination - 1;
+            modelAndView.addObject("pagination", paginationMinusOne);
             return modelAndView;
 
         } catch (Exception e) {
@@ -398,6 +399,18 @@ public class BitstampController {
         } finally {
             return "redirect:/bitstamp";
         }
+    }
+
+    @GetMapping(value = {"/bitstamp/pagination/{totalPagination}/{pageId}"})
+    public ModelAndView getBalanceListByPagination(@PathVariable Integer totalPagination, @PathVariable Integer pageId) {
+        ModelAndView modelAndView = new ModelAndView("bitstamp/pagination");
+        List<Balance> balanceListByPagination = bitstampService.getBalanceListByPagination(totalPagination + 1 - pageId);
+        String datePagination = balanceListByPagination.get(0).getDate_pagination();
+        modelAndView.addObject("balanceListByPagination", balanceListByPagination);
+        modelAndView.addObject("datePagination", datePagination);
+        modelAndView.addObject("pagination", totalPagination);
+        modelAndView.addObject("current_pagination", pageId);
+        return modelAndView;
     }
 
     private String getUserTransactions(Properties props) throws NoSuchAlgorithmException, InvalidKeyException, IOException, InterruptedException {

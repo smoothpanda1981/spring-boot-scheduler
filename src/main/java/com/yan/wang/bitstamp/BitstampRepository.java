@@ -10,4 +10,6 @@ public interface BitstampRepository {
 	public void saveBalanceList(List<Balance> balanceList) ;
 
 	public Integer getPagination();
+
+	public List<Balance> getBalanceListByPagination(Integer pageId);
 }

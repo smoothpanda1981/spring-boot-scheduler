@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="#{view.index.title}">Welcome!</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link href="../../../resources/css/bootstrap.min.css" rel="stylesheet" media="screen" th:href="@{/resources/css/bootstrap.min.css}"/>
+    <link href="../../../resources/css/core.css" rel="stylesheet" media="screen" th:href="@{/resources/css/core.css}" />
+    <script src="../../../resources/js/jquery.min.js" th:src="@{/resources/js/jquery.min.js}"></script>
+    <script src="../../../resources/js/bootstrap.min.js" th:src="@{/resources/js/bootstrap.min.js}"></script>
+</head>
+<body>
+<div th:replace="fragments/layout :: header"></div>
+<div class="container">
+    <h1>Pagination <span th:text="${current_pagination}"/> - <span th:text="${datePagination}"/></h1>
+    <table id="dtBasicExample" class="table table-dark">
+        <thead>
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Portfolio</th>
+                <th scope="col">Value</th>
+                <th scope="col">Paid price</th>
+                <th scope="col">Current price</th>
+                <th scope="col">%</th>
+                <th scope="col">Cost</th>
+                <th scope="col">P/L</th>
+                <th scope="col">Low (24h)</th>
+                <th scope="col">High (24h)</th>
+                <th scope="col">Volume (24h)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="balanceList : ${balanceListByPagination}">
+                <td th:text="${balanceList.name}"></td>
+                <td th:text="${balanceList.portfolioName}"></td>
+                <td th:text="${balanceList.value}"></td>
+                <td th:text="${balanceList.paidPrice}"></td>
+                <td th:text="${balanceList.currentPrice}"></td>
+                <td th:switch="${balanceList.profitOrLossPercentage}">
+                    <span th:case="'black'" th:text="${balanceList.priceUpDownPercent}"></span>
+                    <span th:case="'red'" th:style="'color:red'" th:text="${balanceList.priceUpDownPercent}"></span>
+                    <span th:case="'green'" th:style="'color:green'" th:text="${balanceList.priceUpDownPercent}"></span>
+                </td>
+                <td th:text="${balanceList.amountSpendToBuy}"></td>
+                <td th:switch="${balanceList.profitOrLossPercentage}">
+                    <span th:case="'black'" th:text="${balanceList.profitOrLossValue}"></span>
+                    <span th:case="'red'" th:style="'color:red'" th:text="${balanceList.profitOrLossValue}"></span>
+                    <span th:case="'green'" th:style="'color:green'" th:text="${balanceList.profitOrLossValue}"></span>
+                </td>
+                <td th:text="${balanceList.last24Low}"></td>
+                <td th:text="${balanceList.last24High}"></td>
+                <td th:text="${balanceList.last24Volume}"></td>
+            </tr>
+        </tbody>
+    </table>
+    <div th:switch="${pagination}">
+        <p th:case="1">
+            Pagination :
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 1">
+                1
+            </th:block>
+            <th:block th:unless="${current_pagination} == 1">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/1(totalPagination=${pagination})}">1</a>
+            </th:block>
+            &nbsp;&nbsp;
+            2
+            &nbsp;&nbsp;
+            3
+            &nbsp;&nbsp;
+            4
+            &nbsp;&nbsp;
+            5
+            &nbsp;&nbsp;
+            6
+            &nbsp;&nbsp;
+            7
+            &nbsp;&nbsp;
+            8
+            &nbsp;&nbsp;
+            9
+            &nbsp;&nbsp;
+            10
+        </p>
+        <p th:case="2">
+            Pagination :
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 1">
+                1
+            </th:block>
+            <th:block th:unless="${current_pagination} == 1">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/1(totalPagination=${pagination})}">1</a>
+            </th:block>
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 2">
+                2
+            </th:block>
+            <th:block th:unless="${current_pagination} == 2">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/2(totalPagination=${pagination})}">2</a>
+            </th:block>
+            &nbsp;&nbsp;
+            3
+            &nbsp;&nbsp;
+            4
+            &nbsp;&nbsp;
+            5
+            &nbsp;&nbsp;
+            6
+            &nbsp;&nbsp;
+            7
+            &nbsp;&nbsp;
+            8
+            &nbsp;&nbsp;
+            9
+            &nbsp;&nbsp;
+            10
+        </p>
+        <p th:case="3">
+            Pagination :
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 1">
+                1
+            </th:block>
+            <th:block th:unless="${current_pagination} == 1">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/1(totalPagination=${pagination})}">1</a>
+            </th:block>
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 2">
+                2
+            </th:block>
+            <th:block th:unless="${current_pagination} == 2">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/2(totalPagination=${pagination})}">2</a>
+            </th:block>
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 3">
+                3
+            </th:block>
+            <th:block th:unless="${current_pagination} == 3">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/3(totalPagination=${pagination})}">3</a>
+            </th:block>
+            &nbsp;&nbsp;
+            4
+            &nbsp;&nbsp;
+            5
+            &nbsp;&nbsp;
+            6
+            &nbsp;&nbsp;
+            7
+            &nbsp;&nbsp;
+            8
+            &nbsp;&nbsp;
+            9
+            &nbsp;&nbsp;
+            10
+        </p>
+        <p th:case="4">
+            Pagination :
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 1">
+                1
+            </th:block>
+            <th:block th:unless="${current_pagination} == 1">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/1(totalPagination=${pagination})}">1</a>
+            </th:block>
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 2">
+                2
+            </th:block>
+            <th:block th:unless="${current_pagination} == 2">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/2(totalPagination=${pagination})}">2</a>
+            </th:block>
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 3">
+                3
+            </th:block>
+            <th:block th:unless="${current_pagination} == 3">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/3(totalPagination=${pagination})}">3</a>
+            </th:block>
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 4">
+                4
+            </th:block>
+            <th:block th:unless="${current_pagination} == 4">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/4(totalPagination=${pagination})}">4</a>
+            </th:block>
+            &nbsp;&nbsp;
+            5
+            &nbsp;&nbsp;
+            6
+            &nbsp;&nbsp;
+            7
+            &nbsp;&nbsp;
+            8
+            &nbsp;&nbsp;
+            9
+            &nbsp;&nbsp;
+            10
+        </p>
+        <p th:case="5">
+            Pagination :
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 1">
+                1
+            </th:block>
+            <th:block th:unless="${current_pagination} == 1">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/1(totalPagination=${pagination})}">1</a>
+            </th:block>
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 2">
+                2
+            </th:block>
+            <th:block th:unless="${current_pagination} == 2">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/2(totalPagination=${pagination})}">2</a>
+            </th:block>
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 3">
+                3
+            </th:block>
+            <th:block th:unless="${current_pagination} == 3">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/3(totalPagination=${pagination})}">3</a>
+            </th:block>
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 4">
+                4
+            </th:block>
+            <th:block th:unless="${current_pagination} == 4">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/4(totalPagination=${pagination})}">4</a>
+            </th:block>
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 5">
+                5
+            </th:block>
+            <th:block th:unless="${current_pagination} == 5">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/5(totalPagination=${pagination})}">5</a>
+            </th:block>
+            &nbsp;&nbsp;
+            6
+            &nbsp;&nbsp;
+            7
+            &nbsp;&nbsp;
+            8
+            &nbsp;&nbsp;
+            9
+            &nbsp;&nbsp;
+            10
+        </p>
+        <p th:case="6">
+            Pagination :
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 1">
+                1
+            </th:block>
+            <th:block th:unless="${current_pagination} == 1">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/1(totalPagination=${pagination})}">1</a>
+            </th:block>
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 2">
+                2
+            </th:block>
+            <th:block th:unless="${current_pagination} == 2">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/2(totalPagination=${pagination})}">2</a>
+            </th:block>
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 3">
+                3
+            </th:block>
+            <th:block th:unless="${current_pagination} == 3">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/3(totalPagination=${pagination})}">3</a>
+            </th:block>
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 4">
+                4
+            </th:block>
+            <th:block th:unless="${current_pagination} == 4">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/4(totalPagination=${pagination})}">4</a>
+            </th:block>
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 5">
+                5
+            </th:block>
+            <th:block th:unless="${current_pagination} == 5">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/5(totalPagination=${pagination})}">5</a>
+            </th:block>
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 6">
+                6
+            </th:block>
+            <th:block th:unless="${current_pagination} == 6">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/6(totalPagination=${pagination})}">6</a>
+            </th:block>
+            &nbsp;&nbsp;
+            7
+            &nbsp;&nbsp;
+            8
+            &nbsp;&nbsp;
+            9
+            &nbsp;&nbsp;
+            10
+        </p>
+        <p th:case="7">
+            Pagination :
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 1">
+                1
+            </th:block>
+            <th:block th:unless="${current_pagination} == 1">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/1(totalPagination=${pagination})}">1</a>
+            </th:block>
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 2">
+                2
+            </th:block>
+            <th:block th:unless="${current_pagination} == 2">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/2(totalPagination=${pagination})}">2</a>
+            </th:block>
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 3">
+                3
+            </th:block>
+            <th:block th:unless="${current_pagination} == 3">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/3(totalPagination=${pagination})}">3</a>
+            </th:block>
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 4">
+                4
+            </th:block>
+            <th:block th:unless="${current_pagination} == 4">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/4(totalPagination=${pagination})}">4</a>
+            </th:block>
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 5">
+                5
+            </th:block>
+            <th:block th:unless="${current_pagination} == 5">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/5(totalPagination=${pagination})}">5</a>
+            </th:block>
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 6">
+                6
+            </th:block>
+            <th:block th:unless="${current_pagination} == 6">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/6(totalPagination=${pagination})}">6</a>
+            </th:block>
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 7">
+                7
+            </th:block>
+            <th:block th:unless="${current_pagination} == 7">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/7(totalPagination=${pagination})}">7</a>
+            </th:block>
+            &nbsp;&nbsp;
+            8
+            &nbsp;&nbsp;
+            9
+            &nbsp;&nbsp;
+            10
+        </p>
+        <p th:case="8">
+            Pagination :
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 1">
+                1
+            </th:block>
+            <th:block th:unless="${current_pagination} == 1">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/1(totalPagination=${pagination})}">1</a>
+            </th:block>
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 2">
+                2
+            </th:block>
+            <th:block th:unless="${current_pagination} == 2">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/2(totalPagination=${pagination})}">2</a>
+            </th:block>
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 3">
+                3
+            </th:block>
+            <th:block th:unless="${current_pagination} == 3">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/3(totalPagination=${pagination})}">3</a>
+            </th:block>
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 4">
+                4
+            </th:block>
+            <th:block th:unless="${current_pagination} == 4">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/4(totalPagination=${pagination})}">4</a>
+            </th:block>
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 5">
+                5
+            </th:block>
+            <th:block th:unless="${current_pagination} == 5">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/5(totalPagination=${pagination})}">5</a>
+            </th:block>
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 6">
+                6
+            </th:block>
+            <th:block th:unless="${current_pagination} == 6">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/6(totalPagination=${pagination})}">6</a>
+            </th:block>
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 7">
+                7
+            </th:block>
+            <th:block th:unless="${current_pagination} == 7">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/7(totalPagination=${pagination})}">7</a>
+            </th:block>
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 8">
+                8
+            </th:block>
+            <th:block th:unless="${current_pagination} == 8">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/8(totalPagination=${pagination})}">8</a>
+            </th:block>
+            &nbsp;&nbsp;
+            9
+            &nbsp;&nbsp;
+            10
+        </p>
+        <p th:case="9">
+            Pagination :
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 1">
+                1
+            </th:block>
+            <th:block th:unless="${current_pagination} == 1">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/1(totalPagination=${pagination})}">1</a>
+            </th:block>
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 2">
+                2
+            </th:block>
+            <th:block th:unless="${current_pagination} == 2">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/2(totalPagination=${pagination})}">2</a>
+            </th:block>
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 3">
+                3
+            </th:block>
+            <th:block th:unless="${current_pagination} == 3">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/3(totalPagination=${pagination})}">3</a>
+            </th:block>
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 4">
+                4
+            </th:block>
+            <th:block th:unless="${current_pagination} == 4">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/4(totalPagination=${pagination})}">4</a>
+            </th:block>
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 5">
+                5
+            </th:block>
+            <th:block th:unless="${current_pagination} == 5">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/5(totalPagination=${pagination})}">5</a>
+            </th:block>
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 6">
+                6
+            </th:block>
+            <th:block th:unless="${current_pagination} == 6">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/6(totalPagination=${pagination})}">6</a>
+            </th:block>
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 7">
+                7
+            </th:block>
+            <th:block th:unless="${current_pagination} == 7">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/7(totalPagination=${pagination})}">7</a>
+            </th:block>
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 8">
+                8
+            </th:block>
+            <th:block th:unless="${current_pagination} == 8">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/8(totalPagination=${pagination})}">8</a>
+            </th:block>
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 9">
+                9
+            </th:block>
+            <th:block th:unless="${current_pagination} == 9">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/9(totalPagination=${pagination})}">9</a>
+            </th:block>
+            &nbsp;&nbsp;
+            10
+        </p>
+        <p th:case="10">
+            Pagination :
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 1">
+                1
+            </th:block>
+            <th:block th:unless="${current_pagination} == 1">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/1(totalPagination=${pagination})}">1</a>
+            </th:block>
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 2">
+                2
+            </th:block>
+            <th:block th:unless="${current_pagination} == 2">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/2(totalPagination=${pagination})}">2</a>
+            </th:block>
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 3">
+                3
+            </th:block>
+            <th:block th:unless="${current_pagination} == 3">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/3(totalPagination=${pagination})}">3</a>
+            </th:block>
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 4">
+                4
+            </th:block>
+            <th:block th:unless="${current_pagination} == 4">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/4(totalPagination=${pagination})}">4</a>
+            </th:block>
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 5">
+                5
+            </th:block>
+            <th:block th:unless="${current_pagination} == 5">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/5(totalPagination=${pagination})}">5</a>
+            </th:block>
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 6">
+                6
+            </th:block>
+            <th:block th:unless="${current_pagination} == 6">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/6(totalPagination=${pagination})}">6</a>
+            </th:block>
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 7">
+                7
+            </th:block>
+            <th:block th:unless="${current_pagination} == 7">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/7(totalPagination=${pagination})}">7</a>
+            </th:block>
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 8">
+                8
+            </th:block>
+            <th:block th:unless="${current_pagination} == 8">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/8(totalPagination=${pagination})}">8</a>
+            </th:block>
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 9">
+                9
+            </th:block>
+            <th:block th:unless="${current_pagination} == 9">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/9(totalPagination=${pagination})}">9</a>
+            </th:block>
+            &nbsp;&nbsp;
+            <th:block th:if="${current_pagination} == 10">
+                10
+            </th:block>
+            <th:block th:unless="${current_pagination} == 10">
+                <a th:href="@{/bitstamp/pagination/{totalPagination}/10(totalPagination=${pagination})}">10</a>
+            </th:block>
+        </p>
+        <p th:case="*">No pagination</p>
+    </div>
+</div>
+<div th:replace="fragments/layout :: footer"></div>
+</body>
+</html>

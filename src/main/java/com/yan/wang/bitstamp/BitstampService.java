@@ -18,4 +18,8 @@ public class BitstampService {
 	public Integer getPagination() {
 		return bitstampRepository.getPagination();
 	}
+
+	public List<Balance> getBalanceListByPagination(Integer pageId) {
+		return bitstampRepository.getBalanceListByPagination(pageId);
+	}
 }
