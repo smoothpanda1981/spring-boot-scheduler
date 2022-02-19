@@ -1,30 +1,58 @@
 package com.yan.wang.bitstamp;
 
-public class Balance {
+import javax.persistence.*;
+import java.io.Serializable;
 
+@SuppressWarnings("serial")
+@Entity
+@Table(name = "balance")
+public class Balance implements Serializable {
+
+	@Id
+	@GeneratedValue
+	private Long id;
+
+	@Column(name = "crypto_name")
 	private String name;
 
+	@Column(name = "crypto_value")
 	private String value;
 
+	@Column(name = "paid_price")
 	private String paidPrice;
 
+	@Column(name = "current_price")
 	private String currentPrice;
 
+	@Column(name = "amount_spend_to_buy")
 	private String amountSpendToBuy;
 
+	@Column(name = "profit_or_loss_value")
 	private String profitOrLossValue;
 
+	@Column(name = "profit_or_loss_percentage")
 	private String profitOrLossPercentage;
 
+	@Column(name = "price_up_down_percentage")
 	private String priceUpDownPercent;
 
+	@Column(name = "portfolio_name")
 	private String portfolioName;
 
+	@Column(name = "last_24_high")
 	private String last24High;
 
+	@Column(name = "last_24_low")
 	private String last24Low;
 
+	@Column(name = "last_24_volume")
 	private String last24Volume;
+
+	@Column(name = "pagination")
+	private Integer pagination;
+
+	@Column(name = "date_pagination")
+	private String date_pagination;
 
 	public String getName() {
 		return name;
@@ -120,5 +148,29 @@ public class Balance {
 
 	public void setLast24Volume(String last24Volume) {
 		this.last24Volume = last24Volume;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Integer getPagination() {
+		return pagination;
+	}
+
+	public void setPagination(Integer pagination) {
+		this.pagination = pagination;
+	}
+
+	public String getDate_pagination() {
+		return date_pagination;
+	}
+
+	public void setDate_pagination(String date_pagination) {
+		this.date_pagination = date_pagination;
 	}
 }

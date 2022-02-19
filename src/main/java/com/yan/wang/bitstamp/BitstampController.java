@@ -1,7 +1,9 @@
 package com.yan.wang.bitstamp;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yan.wang.findata.BuySellBtcUsdService;
 import org.apache.commons.codec.binary.Hex;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -18,10 +20,16 @@ import java.net.http.HttpResponse;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Controller
 public class BitstampController {
+
+    @Autowired
+    private BitstampService bitstampService;
 
     @GetMapping("/bitstamp")
     public ModelAndView getGeneralData() {
@@ -131,6 +139,10 @@ public class BitstampController {
 
             List<Balance> balanceList5 = new ArrayList<Balance>();
             List<Balance> balanceList6 = new ArrayList<Balance>();
+            Integer pagination = bitstampService.getPagination();
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            LocalDateTime now = LocalDateTime.now();
+            String datePagination = dtf.format(now);
             for (Balance balance : balanceList4) {
                 Balance balance5 = new Balance();
                 balance5.setName(balance.getName());
@@ -153,6 +165,10 @@ public class BitstampController {
                 balance5.setProfitOrLossPercentage(balance.getProfitOrLossPercentage());
                 balance5.setPriceUpDownPercent(balance.getPriceUpDownPercent());
                 balance5.setPortfolioName(balance.getPortfolioName());
+
+                // add pagination
+                balance5.setPagination(pagination);
+                balance5.setDate_pagination(datePagination);
 
                 if (balance.getName().startsWith("usd_") || balance.getName().startsWith("eur_")) {
                     balanceList6.add(balance5);
@@ -253,6 +269,8 @@ public class BitstampController {
                 Ticker ticker = getTicker(crypto);
                 userTransaction.setCurrentPrice(ticker.getLast());
             }
+
+            bitstampService.saveBalanceList(balanceList5);
 
             ModelAndView modelAndView = new ModelAndView("bitstamp/bitstamp");
             modelAndView.addObject("balanceList5", balanceList5);
