@@ -276,6 +276,7 @@ public class BitstampController {
             modelAndView.addObject("balanceList5", balanceList5);
             modelAndView.addObject("balanceList6", balanceList6);
             modelAndView.addObject("balanceList7", sortedUserTransactionList);
+            System.out.println("test push jenkins");
             return modelAndView;
 
         } catch (Exception e) {
