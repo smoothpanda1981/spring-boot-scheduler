@@ -560,6 +560,47 @@
         </p>
         <p th:case="*">No pagination</p>
     </div>
+    <h1>Latest Pagination</h1>
+    <table id="dtBasicExample2" class="table table-dark">
+        <thead>
+        <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Portfolio</th>
+            <th scope="col">Value</th>
+            <th scope="col">Paid price</th>
+            <th scope="col">Current price</th>
+            <th scope="col">%</th>
+            <th scope="col">Cost</th>
+            <th scope="col">P/L</th>
+            <th scope="col">Low (24h)</th>
+            <th scope="col">High (24h)</th>
+            <th scope="col">Volume (24h)</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="balanceList : ${balanceListByPaginationLatest}">
+            <td th:text="${balanceList.name}"></td>
+            <td th:text="${balanceList.portfolioName}"></td>
+            <td th:text="${balanceList.value}"></td>
+            <td th:text="${balanceList.paidPrice}"></td>
+            <td th:text="${balanceList.currentPrice}"></td>
+            <td th:switch="${balanceList.profitOrLossPercentage}">
+                <span th:case="'black'" th:text="${balanceList.priceUpDownPercent}"></span>
+                <span th:case="'red'" th:style="'color:red'" th:text="${balanceList.priceUpDownPercent}"></span>
+                <span th:case="'green'" th:style="'color:green'" th:text="${balanceList.priceUpDownPercent}"></span>
+            </td>
+            <td th:text="${balanceList.amountSpendToBuy}"></td>
+            <td th:switch="${balanceList.profitOrLossPercentage}">
+                <span th:case="'black'" th:text="${balanceList.profitOrLossValue}"></span>
+                <span th:case="'red'" th:style="'color:red'" th:text="${balanceList.profitOrLossValue}"></span>
+                <span th:case="'green'" th:style="'color:green'" th:text="${balanceList.profitOrLossValue}"></span>
+            </td>
+            <td th:text="${balanceList.last24Low}"></td>
+            <td th:text="${balanceList.last24High}"></td>
+            <td th:text="${balanceList.last24Volume}"></td>
+        </tr>
+        </tbody>
+    </table>
 </div>
 <div th:replace="fragments/layout :: footer"></div>
 </body>

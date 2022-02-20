@@ -412,8 +412,10 @@ public class BitstampController {
     public ModelAndView getBalanceListByPagination(@PathVariable Integer totalPagination, @PathVariable Integer pageId) {
         ModelAndView modelAndView = new ModelAndView("bitstamp/pagination");
         List<Balance> balanceListByPagination = bitstampService.getBalanceListByPagination(totalPagination + 1 - pageId);
+        List<Balance> balanceListByPaginationLatest = bitstampService.getBalanceListByPagination(totalPagination + 1);
         String datePagination = balanceListByPagination.get(0).getDate_pagination();
         modelAndView.addObject("balanceListByPagination", balanceListByPagination);
+        modelAndView.addObject("balanceListByPaginationLatest", balanceListByPaginationLatest);
         modelAndView.addObject("datePagination", datePagination);
         modelAndView.addObject("pagination", totalPagination);
         modelAndView.addObject("current_pagination", pageId);
