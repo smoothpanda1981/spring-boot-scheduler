@@ -12,4 +12,8 @@ public interface BitstampRepository {
 	public Integer getPagination();
 
 	public List<Balance> getBalanceListByPagination(Integer pageId);
+
+	public void deleteBalance(Balance balance);
+
+	public void dumpOldestPagination();
 }

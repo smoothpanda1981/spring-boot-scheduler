@@ -276,6 +276,12 @@ public class BitstampController {
             modelAndView.addObject("balanceList5", balanceList5);
             modelAndView.addObject("balanceList6", balanceList6);
             modelAndView.addObject("balanceList7", sortedUserTransactionList);
+
+            if (pagination == 12) {
+                // delete in database
+                bitstampService.dumpOldestPagination();
+                pagination = 11;
+            }
             Integer paginationMinusOne = pagination - 1;
             modelAndView.addObject("pagination", paginationMinusOne);
             return modelAndView;

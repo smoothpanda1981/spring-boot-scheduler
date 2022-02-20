@@ -22,4 +22,12 @@ public class BitstampService {
 	public List<Balance> getBalanceListByPagination(Integer pageId) {
 		return bitstampRepository.getBalanceListByPagination(pageId);
 	}
+
+	public void deleteBalance(Balance balance) {
+		bitstampRepository.deleteBalance(balance);
+	}
+
+	public void dumpOldestPagination() {
+		bitstampRepository.dumpOldestPagination();
+	}
 }
