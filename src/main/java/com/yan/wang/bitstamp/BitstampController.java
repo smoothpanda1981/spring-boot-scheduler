@@ -22,6 +22,7 @@ import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -141,7 +142,7 @@ public class BitstampController {
             List<Balance> balanceList6 = new ArrayList<Balance>();
             Integer pagination = bitstampService.getPagination();
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime now = LocalDateTime.now(ZoneId.of("GMT+01:00"));
             String datePagination = dtf.format(now);
             for (Balance balance : balanceList4) {
                 Balance balance5 = new Balance();
