@@ -39,6 +39,17 @@ public class BitstampRepositoryImpl implements BitstampRepository {
     }
 
     @Override
+    public Integer getPaginationForIA() {
+        Integer page = entityManager.createQuery("select max(b.pagination) from BalanceForIA b", Integer.class).getSingleResult();
+        if (page == null) {
+            page = 1;
+        } else {
+            page = page + 1;
+        }
+        return page;
+    }
+
+    @Override
     @Transactional
     public List<Balance> getBalanceListByPagination(Integer pageId) {
         List<Balance> balanceListByPagination = entityManager.createQuery("from Balance b where b.pagination = " + pageId, Balance.class).getResultList();
@@ -85,5 +96,11 @@ public class BitstampRepositoryImpl implements BitstampRepository {
         saveBalanceList(balanceListWithoutPagination1);
     }
 
-
+    @Override
+    @Transactional
+    public void saveBalanceListInIA(List<BalanceForIA> balanceForIAList) {
+        for (BalanceForIA balanceForIA : balanceForIAList) {
+            entityManager.persist(balanceForIA);
+        }
+    }
 }

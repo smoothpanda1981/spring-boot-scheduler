@@ -1,7 +1,6 @@
 package com.yan.wang.bitstamp;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yan.wang.findata.BuySellBtcUsdService;
 import org.apache.commons.codec.binary.Hex;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -20,7 +19,6 @@ import java.net.http.HttpResponse;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -272,6 +270,9 @@ public class BitstampController {
             }
 
             bitstampService.saveBalanceList(balanceList5);
+            List<BalanceForIA> balanceForIAList = copyBalanceListIntoBalanceForIAList(balanceList5);
+            bitstampService.saveBalanceListInIA(balanceForIAList);
+
 
             ModelAndView modelAndView = new ModelAndView("bitstamp/bitstamp");
             modelAndView.addObject("balanceList5", balanceList5);
@@ -827,5 +828,30 @@ public class BitstampController {
             }
         }
         return result;
+    }
+
+    private List<BalanceForIA> copyBalanceListIntoBalanceForIAList(List<Balance> balanceList) {
+        List<BalanceForIA> balanceForIAList = new ArrayList<BalanceForIA>();
+        for (Balance balance : balanceList) {
+            BalanceForIA balanceForIA = new BalanceForIA();
+            balanceForIA.setName(balance.getName());
+            balanceForIA.setValue(balance.getValue());
+            balanceForIA.setPaidPrice(balance.getPaidPrice());
+            balanceForIA.setCurrentPrice(balance.getCurrentPrice());
+            balanceForIA.setAmountSpendToBuy(balance.getAmountSpendToBuy());
+            balanceForIA.setProfitOrLossValue(balance.getProfitOrLossValue());
+            balanceForIA.setProfitOrLossPercentage(balance.getProfitOrLossPercentage());
+            balanceForIA.setPriceUpDownPercent(balance.getPriceUpDownPercent());
+            balanceForIA.setPortfolioName(balance.getPortfolioName());
+            balanceForIA.setLast24High(balance.getLast24High());
+            balanceForIA.setLast24Low(balance.getLast24Low());
+            balanceForIA.setLast24Volume(balance.getLast24Volume());
+            Integer paginationForIA = bitstampService.getPaginationForIA();
+            balanceForIA.setPagination(paginationForIA);
+            balanceForIA.setDate_pagination(balance.getDate_pagination());
+
+            balanceForIAList.add(balanceForIA);
+        }
+        return balanceForIAList;
     }
 }
