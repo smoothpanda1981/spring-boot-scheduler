@@ -7,6 +7,7 @@
     <link href="../../../resources/css/core.css" rel="stylesheet" media="screen" th:href="@{/resources/css/core.css}" />
     <script src="../../../resources/js/jquery.min.js" th:src="@{/resources/js/jquery.min.js}"></script>
     <script src="../../../resources/js/bootstrap.min.js" th:src="@{/resources/js/bootstrap.min.js}"></script>
+    <script src="https://code.iconify.design/2/2.1.2/iconify.min.js"></script>
 </head>
 <body>
 <div th:replace="fragments/layout :: header"></div>
@@ -27,6 +28,7 @@
                 <th scope="col">High (24h)</th>
                 <th scope="col">Volume (24h)</th>
                 <th scope="col">Add/Edit/<a th:href="@{/bitstamp/delete}">Delete</a></th>
+                <th scope="col">Chart</th>
             </tr>
         </thead>
         <tbody>
@@ -56,6 +58,9 @@
                 <td th:switch="${balanceList.paidPrice != '-'}">
                     <span th:case="${true}"><a th:href="@{/bitstamp/{cryptoId}/edit(cryptoId=${balanceList.name})}">Edit</a></span>
                     <span th:case="*"><a th:href="@{/bitstamp/{cryptoId}/add(cryptoId=${balanceList.name})}">Add</a></span>
+                </td>
+                <td>
+                    <span class="iconify" data-icon="emojione:chart-increasing"></span>
                 </td>
             </tr>
         </tbody>
