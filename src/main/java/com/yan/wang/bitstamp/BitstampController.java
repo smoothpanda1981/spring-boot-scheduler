@@ -415,7 +415,6 @@ public class BitstampController {
         org.jfree.data.time.TimeSeries chartTimeSeries = new org.jfree.data.time.TimeSeries(name);
         for (int i = 0; i < barSeries.getBarCount(); i++) {
             Bar bar = barSeries.getBar(i);
-            System.out.println("bar_endTime : " + bar.getEndTime().toInstant());
             //chartTimeSeries.add(new Hour(Date.from(bar.getEndTime().toInstant())), indicator.getValue(i).doubleValue());
             chartTimeSeries.add(new Minute(Date.from(bar.getEndTime().toInstant())), indicator.getValue(i).doubleValue());
         }
