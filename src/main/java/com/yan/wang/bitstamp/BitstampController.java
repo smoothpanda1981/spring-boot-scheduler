@@ -1,28 +1,53 @@
 package com.yan.wang.bitstamp;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.io.IOUtils;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.DateAxis;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.data.time.Minute;
+import org.jfree.data.time.TimeSeriesCollection;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import org.ta4j.core.Bar;
+import org.ta4j.core.BarSeries;
+import org.ta4j.core.BaseBarSeriesBuilder;
+import org.ta4j.core.Indicator;
+import org.ta4j.core.indicators.helpers.OpenPriceIndicator;
+import org.ta4j.core.num.Num;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+
+import static org.jfree.chart.ChartUtilities.writeChartAsJPEG;
 
 @Controller
 public class BitstampController {
@@ -348,6 +373,100 @@ public class BitstampController {
             modelAndView.addObject("deleteList", deleteList);
             return modelAndView;
         }
+    }
+
+    @GetMapping(value = {"bitstamp/chart/{cryptoId}"})
+    public ModelAndView buildCryptoChart(@PathVariable String cryptoId, HttpServletResponse response) {
+        try {
+            String[] cryptoName = cryptoId.split("_");
+            String newCryptoName = cryptoName[0] + "usd";
+            String newCryptoNameWithUnderscore = cryptoName[0] + "_usd";
+            BarSeries series = loadBarSeries(newCryptoName);
+            OpenPriceIndicator openPrice = new OpenPriceIndicator(series);
+            TimeSeriesCollection dataset = new TimeSeriesCollection();
+            dataset.addSeries(buildChartBarSeries(series, openPrice, newCryptoNameWithUnderscore + " Open Price"));
+            JFreeChart chart = ChartFactory.createTimeSeriesChart(newCryptoNameWithUnderscore + " Open Price", // title
+                    "Date", // x-axis label
+                    "Price", // y-axis label
+                    dataset, // data
+                    true, // create legend?
+                    true, // generate tooltips?
+                    false // generate URLs?
+            );
+            XYPlot plot = (XYPlot) chart.getPlot();
+            DateAxis axis = (DateAxis) plot.getDomainAxis();
+            axis.setDateFormatOverride(new SimpleDateFormat("yyyy-MM-dd"));
+
+            int width = 1028;    /* Width of the image */
+            int height = 768;   /* Height of the image */
+
+            response.setContentType("image/jpeg");
+            OutputStream out = response.getOutputStream();
+            writeChartAsJPEG(out , chart , width, height);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        ModelAndView modelAndView = new ModelAndView("bitstamp/chart");
+        return  modelAndView;
+    }
+
+    private static org.jfree.data.time.TimeSeries buildChartBarSeries(BarSeries barSeries, Indicator<Num> indicator, String name) {
+        org.jfree.data.time.TimeSeries chartTimeSeries = new org.jfree.data.time.TimeSeries(name);
+        for (int i = 0; i < barSeries.getBarCount(); i++) {
+            Bar bar = barSeries.getBar(i);
+            System.out.println("bar_endTime : " + bar.getEndTime().toInstant());
+            //chartTimeSeries.add(new Hour(Date.from(bar.getEndTime().toInstant())), indicator.getValue(i).doubleValue());
+            chartTimeSeries.add(new Minute(Date.from(bar.getEndTime().toInstant())), indicator.getValue(i).doubleValue());
+        }
+        return chartTimeSeries;
+    }
+
+    private BarSeries loadBarSeries(String barSeriesName) {
+        BarSeries series = new BaseBarSeriesBuilder().withName(barSeriesName).build();
+        String composeUrl = "https://www.bitstamp.net/api/v2/ohlc/" + barSeriesName + "/?step=900&limit=1000";
+        URL url = null;
+        try {
+            url = new URL(composeUrl);
+            // Open a connection(?) on the URL(??) and cast the response(???)
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+            // Now it's "open", we can set the request method, headers etc.
+            connection.setRequestProperty("accept", "application/json");
+
+            // This line makes the request
+            InputStream responseStream = connection.getInputStream();
+            String result = IOUtils.toString(responseStream, StandardCharsets.UTF_8);
+            int openBucket = result.indexOf("[");
+            int endBucket = result.indexOf("]");
+            String subResult = result.substring(openBucket-1, endBucket+1);
+            InputStream targetStream = new ByteArrayInputStream(subResult.getBytes());
+
+
+            // Manually converting the response body InputStream to CurrentPrice using Jackson
+            ObjectMapper mapper = new ObjectMapper();
+            OHLC[] ohlcTab = mapper.readValue(targetStream, OHLC[].class);
+
+            for (OHLC ohlc : ohlcTab) {
+                System.out.println(ohlc.getTimestamp() + " - " + ohlc.getClose() + "- " + ohlc.getVolume() + " - " + ohlc.getHigh());
+                Date dateToConvert = new Date(Long.valueOf(ohlc.getTimestamp()) * 1000);
+                System.out.println(dateToConvert);
+                ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(dateToConvert.toInstant(),ZoneId.of("+01:00"));
+
+                System.out.println(zonedDateTime);
+                series.addBar(zonedDateTime, ohlc.getOpen(), ohlc.getHigh(), ohlc.getLow(), ohlc.getClose(), ohlc.getVolume());
+                System.out.println("---------------------------");
+            }
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (JsonMappingException e) {
+            e.printStackTrace();
+        } catch (JsonParseException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return series;
     }
 
     @PostMapping(value = {"/bitstamp/{cryptoId}/edit"})
