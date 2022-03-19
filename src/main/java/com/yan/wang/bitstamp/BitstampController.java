@@ -411,8 +411,9 @@ public class BitstampController {
             BarSeries series = loadBarSeries(newCryptoName, balance.getPagination());
             OpenPriceIndicator openPrice = new OpenPriceIndicator(series);
             TimeSeriesCollection dataset = new TimeSeriesCollection();
-            dataset.addSeries(buildChartBarSeries(series, openPrice, newCryptoNameWithUnderscore + " Open Price"));
-            JFreeChart chart = ChartFactory.createTimeSeriesChart(newCryptoNameWithUnderscore + " Open Price", // title
+            String timeAfterConvertion = convertMinutesBy(balance.getPagination());
+            dataset.addSeries(buildChartBarSeries(series, openPrice, newCryptoNameWithUnderscore + " [" + timeAfterConvertion + "] Open Price"));
+            JFreeChart chart = ChartFactory.createTimeSeriesChart(newCryptoNameWithUnderscore + " [" + timeAfterConvertion + "] Open Price", // title
                     "Date", // x-axis label
                     "Price", // y-axis label
                     dataset, // data
@@ -810,6 +811,51 @@ public class BitstampController {
         // Finally we have the response
         return ticker;
 
+    }
+
+    private String convertMinutesBy(Integer step) {
+        String result = "";
+        switch(step) {
+            case 60 :
+                result = "1 min";
+                break;
+            case 180 :
+                result = "3 min";
+                break;
+            case 300 :
+                result = "5 min";
+                break;
+            case 900 :
+                result = "15 min";
+                break;
+            case 1800 :
+                result = "30 min";
+                break;
+            case 3600 :
+                result = "1 hour";
+                break;
+            case 7200 :
+                result = "2 hours";
+                break;
+            case 14400 :
+                result = "3 hours";
+                break;
+            case 21600 :
+                result = "6 hours";
+                break;
+            case 43200 :
+                result = "12 hours";
+                break;
+            case 86400 :
+                result = "1 day";
+                break;
+            case 259200 :
+                result = "3 days";
+                break;
+            default:
+                result = "1 min";
+        }
+        return result;
     }
 
     private String getPaidPrice(Properties props, String name) {
