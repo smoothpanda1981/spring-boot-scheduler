@@ -60,7 +60,7 @@
                     <span th:case="*"><a th:href="@{/bitstamp/{cryptoId}/add(cryptoId=${balanceList.name})}">Add</a></span>
                 </td>
                 <td>
-                    <a th:target="_blank" th:href="@{/bitstamp/chart/{cryptoId}(cryptoId=${balanceList.name})}"><span class="iconify" data-icon="emojione:chart-increasing"></span></a>
+                    <a th:target="_blank" th:href="@{/bitstamp/select/chart/{cryptoId}(cryptoId=${balanceList.name})}"><span class="iconify" data-icon="emojione:chart-increasing"></span></a>
                 </td>
             </tr>
         </tbody>

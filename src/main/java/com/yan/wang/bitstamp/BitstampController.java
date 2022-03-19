@@ -375,13 +375,40 @@ public class BitstampController {
         }
     }
 
-    @GetMapping(value = {"bitstamp/chart/{cryptoId}"})
-    public ModelAndView buildCryptoChart(@PathVariable String cryptoId, HttpServletResponse response) {
+    @GetMapping(value = {"/bitstamp/select/chart/{cryptoId}"})
+    public ModelAndView selectChart(@PathVariable String cryptoId) {
+        ModelAndView modelAndView = new ModelAndView("bitstamp/chartSelect");
+
+        Map<String, Integer> minuteurList = new LinkedHashMap<String, Integer>();
+        minuteurList.put("1 min", 60);
+        minuteurList.put("3 min", 180);
+        minuteurList.put("5 min", 300);
+        minuteurList.put("15 min", 900);
+        minuteurList.put("30 min", 1800);
+        minuteurList.put("1 H", 3600);
+        minuteurList.put("2 H", 7200);
+        minuteurList.put("3 H", 14400);
+        minuteurList.put("6 H", 21600);
+        minuteurList.put("12 H", 43200);
+        minuteurList.put("1 D", 86400);
+        minuteurList.put("3 D", 259200);
+        modelAndView.addObject("step", minuteurList);
+        Balance balance = new Balance();
+        balance.setName(cryptoId);
+        balance.setPagination(60);;
+        modelAndView.addObject("paidPriceObject", balance);
+        return modelAndView;
+    }
+
+    @PostMapping(value = {"bitstamp/chart/{cryptoId}"})
+    public ModelAndView buildCryptoChart(@PathVariable String cryptoId, @ModelAttribute("paidPriceObject") Balance balance, HttpServletResponse response) {
+        System.out.println("name = " + cryptoId);
+        System.out.println("pagination = " + balance.getPagination());
         try {
             String[] cryptoName = cryptoId.split("_");
             String newCryptoName = cryptoName[0] + "usd";
             String newCryptoNameWithUnderscore = cryptoName[0] + "_usd";
-            BarSeries series = loadBarSeries(newCryptoName);
+            BarSeries series = loadBarSeries(newCryptoName, balance.getPagination());
             OpenPriceIndicator openPrice = new OpenPriceIndicator(series);
             TimeSeriesCollection dataset = new TimeSeriesCollection();
             dataset.addSeries(buildChartBarSeries(series, openPrice, newCryptoNameWithUnderscore + " Open Price"));
@@ -421,9 +448,9 @@ public class BitstampController {
         return chartTimeSeries;
     }
 
-    private BarSeries loadBarSeries(String barSeriesName) {
+    private BarSeries loadBarSeries(String barSeriesName, Integer step) {
         BarSeries series = new BaseBarSeriesBuilder().withName(barSeriesName).build();
-        String composeUrl = "https://www.bitstamp.net/api/v2/ohlc/" + barSeriesName + "/?step=900&limit=1000";
+        String composeUrl = "https://www.bitstamp.net/api/v2/ohlc/" + barSeriesName + "/?step=" + step + "&limit=1000";
         URL url = null;
         try {
             url = new URL(composeUrl);
