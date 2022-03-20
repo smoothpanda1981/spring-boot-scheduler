@@ -13,58 +13,70 @@
 <div th:replace="fragments/layout :: header"></div>
 <div class="container">
     <h1>Crytocurrencies</h1>
-    <table id="dtBasicExample" class="table table-dark">
-        <thead>
-            <tr>
-                <th scope="col">Name</th>
-                <th scope="col">Portfolio</th>
-                <th scope="col">Value</th>
-                <th scope="col">Paid price</th>
-                <th scope="col">Current price</th>
-                <th scope="col">%</th>
-                <th scope="col">Cost</th>
-                <th scope="col">P/L</th>
-                <th scope="col">Low (24h)</th>
-                <th scope="col">High (24h)</th>
-                <th scope="col">Volume (24h)</th>
-                <th scope="col">Add/Edit/<a th:href="@{/bitstamp/delete}">Delete</a></th>
-                <th scope="col">Chart</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="balanceList : ${balanceList5}">
-                <td th:text="${balanceList.name}"></td>
-                <td th:text="${balanceList.portfolioName}"></td>
-                <td th:text="${balanceList.value}"></td>
-                <td th:text="${balanceList.paidPrice}"></td>
-                <td th:text="${balanceList.currentPrice}"></td>
-                <td th:switch="${balanceList.profitOrLossPercentage}">
-                    <span th:case="'black'" th:text="${balanceList.priceUpDownPercent}"></span>
-                    <span th:case="'red'" th:style="'color:red'" th:text="${balanceList.priceUpDownPercent}"></span>
-                    <span th:case="'green'" th:style="'color:green'" th:text="${balanceList.priceUpDownPercent}"></span>
-                </td>
-                <td th:text="${balanceList.amountSpendToBuy}"></td>
-                <td th:switch="${balanceList.profitOrLossPercentage}">
-                    <span th:case="'black'" th:text="${balanceList.profitOrLossValue}"></span>
-                    <span th:case="'red'" th:style="'color:red'" th:text="${balanceList.profitOrLossValue}"></span>
-                    <span th:case="'green'" th:style="'color:green'" th:text="${balanceList.profitOrLossValue}"></span>
-                </td>
-                <td th:text="${balanceList.last24Low}"></td>
-                <td th:text="${balanceList.last24High}"></td>
-                <td th:text="${balanceList.last24Volume}"></td>
-    <!--            <td th:if="${balanceList.paidPrice != '-'}">-->
-    <!--                <a th:href="@{/bitstamp/{cryptoId}/edit(cryptoId=${balanceList.name})}">Edit</a>-->
-    <!--            </td>-->
-                <td th:switch="${balanceList.paidPrice != '-'}">
-                    <span th:case="${true}"><a th:href="@{/bitstamp/{cryptoId}/edit(cryptoId=${balanceList.name})}">Edit</a></span>
-                    <span th:case="*"><a th:href="@{/bitstamp/{cryptoId}/add(cryptoId=${balanceList.name})}">Add</a></span>
-                </td>
-                <td>
-                    <a th:target="_blank" th:href="@{/bitstamp/select/chart/{cryptoId}(cryptoId=${balanceList.name})}"><span class="iconify" data-icon="emojione:chart-increasing"></span></a>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+        <table id="dtBasicExample" class="table table-dark">
+            <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Portfolio</th>
+                    <th scope="col">Value</th>
+                    <th scope="col">Paid price</th>
+                    <th scope="col">Current price</th>
+                    <th scope="col">%</th>
+                    <th scope="col">Cost</th>
+                    <th scope="col">P/L</th>
+                    <th scope="col">Low (24h)</th>
+                    <th scope="col">High (24h)</th>
+                    <th scope="col">Volume (24h)</th>
+                    <th scope="col">Add/Edit/<a th:href="@{/bitstamp/delete}">Delete</a></th>
+                    <th scope="col">Range</th>
+                    <th scope="col">Chart&nbsp<span class="iconify" data-icon="emojione:chart-increasing" /></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="balanceList : ${balanceList5}">
+                    <form th:target="_blank" th:action="@{/bitstamp/chart/{cryptoId}(cryptoId=${balanceList.name})}" th:object="${paidPriceObject}" method="POST">
+                        <td th:text="${balanceList.name}"></td>
+                        <td th:text="${balanceList.portfolioName}"></td>
+                        <td th:text="${balanceList.value}"></td>
+                        <td th:text="${balanceList.paidPrice}"></td>
+                        <td th:text="${balanceList.currentPrice}"></td>
+                        <td th:switch="${balanceList.profitOrLossPercentage}">
+                            <span th:case="'black'" th:text="${balanceList.priceUpDownPercent}"></span>
+                            <span th:case="'red'" th:style="'color:red'" th:text="${balanceList.priceUpDownPercent}"></span>
+                            <span th:case="'green'" th:style="'color:green'" th:text="${balanceList.priceUpDownPercent}"></span>
+                        </td>
+                        <td th:text="${balanceList.amountSpendToBuy}"></td>
+                        <td th:switch="${balanceList.profitOrLossPercentage}">
+                            <span th:case="'black'" th:text="${balanceList.profitOrLossValue}"></span>
+                            <span th:case="'red'" th:style="'color:red'" th:text="${balanceList.profitOrLossValue}"></span>
+                            <span th:case="'green'" th:style="'color:green'" th:text="${balanceList.profitOrLossValue}"></span>
+                        </td>
+                        <td th:text="${balanceList.last24Low}"></td>
+                        <td th:text="${balanceList.last24High}"></td>
+                        <td th:text="${balanceList.last24Volume}"></td>
+            <!--            <td th:if="${balanceList.paidPrice != '-'}">-->
+            <!--                <a th:href="@{/bitstamp/{cryptoId}/edit(cryptoId=${balanceList.name})}">Edit</a>-->
+            <!--            </td>-->
+                        <td th:switch="${balanceList.paidPrice != '-'}">
+                            <span th:case="${true}"><a th:href="@{/bitstamp/{cryptoId}/edit(cryptoId=${balanceList.name})}">Edit</a></span>
+                            <span th:case="*"><a th:href="@{/bitstamp/{cryptoId}/add(cryptoId=${balanceList.name})}">Add</a></span>
+                        </td>
+                        <td>
+                            <select th:field="*{pagination}">
+                                <option th:each="entry : ${step.entrySet()}"
+                                        th:value="${entry.value}"
+                                        th:utext="${entry.key}">
+                                </option>
+                            </select>
+                        </td>
+                        <td>
+    <!--                        <a th:target="_blank" th:href="@{/bitstamp/select/chart/{cryptoId}(cryptoId=${balanceList.name})}"><span class="iconify" data-icon="emojione:chart-increasing"></span></a>-->
+                            <input type="submit" th:value="Generate" />
+                        </td>
+                    </form>
+                </tr>
+            </tbody>
+        </table>
     <div th:switch="${pagination}">
         <p th:case="1">
             Pagination :

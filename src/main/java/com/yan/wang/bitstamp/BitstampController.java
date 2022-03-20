@@ -311,6 +311,24 @@ public class BitstampController {
             }
             Integer paginationMinusOne = pagination - 1;
             modelAndView.addObject("pagination", paginationMinusOne);
+
+            Map<String, Integer> minuteurList = new LinkedHashMap<String, Integer>();
+            minuteurList.put("1 min", 60);
+            minuteurList.put("3 min", 180);
+            minuteurList.put("5 min", 300);
+            minuteurList.put("15 min", 900);
+            minuteurList.put("30 min", 1800);
+            minuteurList.put("1 H", 3600);
+            minuteurList.put("2 H", 7200);
+            minuteurList.put("3 H", 14400);
+            minuteurList.put("6 H", 21600);
+            minuteurList.put("12 H", 43200);
+            minuteurList.put("1 D", 86400);
+            minuteurList.put("3 D", 259200);
+            modelAndView.addObject("step", minuteurList);
+            StepBalance balance = new StepBalance();
+            balance.setPagination(60);;
+            modelAndView.addObject("paidPriceObject", balance);
             return modelAndView;
 
         } catch (Exception e) {
