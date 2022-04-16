@@ -162,7 +162,8 @@ public class BitstampController {
             }
 
             List<Balance> balanceList5 = new ArrayList<Balance>();
-            List<Balance> balanceList6 = new ArrayList<Balance>();
+            List<Balance> balanceList6a = new ArrayList<Balance>();
+            List<Balance> balanceList6b = new ArrayList<Balance>();
             Integer pagination = bitstampService.getPagination();
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             LocalDateTime now = LocalDateTime.now(ZoneId.of("GMT+01:00"));
@@ -195,7 +196,11 @@ public class BitstampController {
                 balance5.setDate_pagination(datePagination);
 
                 if (balance.getName().startsWith("usd_") || balance.getName().startsWith("eur_")) {
-                    balanceList6.add(balance5);
+                    if (balance.getPortfolioName().equals("Main")) {
+                        balanceList6a.add(balance5);
+                    } else {
+                        balanceList6b.add(balance5);
+                    }
                 } else {
                     balanceList5.add(balance5);
                 }
@@ -229,7 +234,7 @@ public class BitstampController {
                             String userTransactionObj = userTransactionTab[k];
                             String[] userTransactionObjTab = userTransactionObj.split(":");
                             if (userTransactionObjTab[0].equals("\"usd\"")) {
-                                Double usd = Double.parseDouble(userTransactionObjTab[1].substring(1, userTransactionObjTab[1].length()-1));
+                                Double usd = Double.parseDouble(userTransactionObjTab[1].substring(1, userTransactionObjTab[1].length() - 1));
                                 DecimalFormat df = new DecimalFormat("0.00");
                                 userTransaction.setUsd(df.format(usd));
                             } else if (userTransactionObjTab[0].equals("\"order_i d\"")) {
@@ -237,32 +242,32 @@ public class BitstampController {
                             } else if (userTransactionObjTab[0].contains("_usd")) {
                                 Double cryptoUsd = Double.parseDouble(userTransactionObjTab[1]);
                                 userTransaction.setCryptoUsd(String.format("%.5f", cryptoUsd));
-                                userTransaction.setCryptoUsdName(userTransactionObjTab[0].substring(1, userTransactionObjTab[0].length()-1));
+                                userTransaction.setCryptoUsdName(userTransactionObjTab[0].substring(1, userTransactionObjTab[0].length() - 1));
                             } else if (userTransactionObjTab[0].equals("\"datetime\"")) {
-                                userTransaction.setDatetime(userTransactionObjTab[1].substring(1, userTransactionObjTab[1].length()-2));
+                                userTransaction.setDatetime(userTransactionObjTab[1].substring(1, userTransactionObjTab[1].length() - 2));
                             } else if (userTransactionObjTab[0].equals("\"fee\"")) {
-                                Double fee = Double.parseDouble(userTransactionObjTab[1].substring(1, userTransactionObjTab[1].length()-1));
+                                Double fee = Double.parseDouble(userTransactionObjTab[1].substring(1, userTransactionObjTab[1].length() - 1));
                                 DecimalFormat df = new DecimalFormat("0.00");
                                 userTransaction.setFee(df.format(fee));
                             } else if (userTransactionObjTab[0].equals("\"btc\"")) {
                                 userTransaction.setBtc(userTransactionObjTab[1]);
                                 if (!userTransactionObjTab[1].equals("0.0")) {
                                     goToElse = false;
-                                    Double cryptoAmount = Double.parseDouble(userTransactionObjTab[1].substring(1, userTransactionObjTab[1].length()-1));
+                                    Double cryptoAmount = Double.parseDouble(userTransactionObjTab[1].substring(1, userTransactionObjTab[1].length() - 1));
                                     userTransaction.setCryptoAmount(String.format("%.4f", cryptoAmount));
-                                    userTransaction.setCryptoAmountName(userTransactionObjTab[0].substring(1, userTransactionObjTab[0].length()-1));
+                                    userTransaction.setCryptoAmountName(userTransactionObjTab[0].substring(1, userTransactionObjTab[0].length() - 1));
                                 }
                             } else if (userTransactionObjTab[0].equals("\"type\"")) {
-                                userTransaction.setType(userTransactionObjTab[1].substring(1, userTransactionObjTab[1].length()-1));
+                                userTransaction.setType(userTransactionObjTab[1].substring(1, userTransactionObjTab[1].length() - 1));
                             } else if (userTransactionObjTab[0].equals("\"id\"")) {
                                 userTransaction.setId(userTransactionObjTab[1]);
                             } else if (userTransactionObjTab[0].equals("\"eur\"")) {
                                 userTransaction.setEur(userTransactionObjTab[1]);
                             } else {
                                 if (goToElse) {
-                                    Double cryptoAmount = Double.parseDouble(userTransactionObjTab[1].substring(1, userTransactionObjTab[1].length()-1));
+                                    Double cryptoAmount = Double.parseDouble(userTransactionObjTab[1].substring(1, userTransactionObjTab[1].length() - 1));
                                     userTransaction.setCryptoAmount(String.format("%.4f", cryptoAmount));
-                                    userTransaction.setCryptoAmountName(userTransactionObjTab[0].substring(1, userTransactionObjTab[0].length()-1));
+                                    userTransaction.setCryptoAmountName(userTransactionObjTab[0].substring(1, userTransactionObjTab[0].length() - 1));
                                 }
                             }
                         }
@@ -301,7 +306,8 @@ public class BitstampController {
 
             ModelAndView modelAndView = new ModelAndView("bitstamp/bitstamp");
             modelAndView.addObject("balanceList5", balanceList5);
-            modelAndView.addObject("balanceList6", balanceList6);
+            modelAndView.addObject("balanceList6a", balanceList6a);
+            modelAndView.addObject("balanceList6b", balanceList6b);
             modelAndView.addObject("balanceList7", sortedUserTransactionList);
 
             if (pagination == 12) {
@@ -645,6 +651,7 @@ public class BitstampController {
         if (!newSignature.equals(serverSignature)) {
             throw new RuntimeException("Signatures do not match");
         }
+        System.out.println("User_Transaction : " + response.body());
         return response.body();
     }
 
@@ -719,7 +726,7 @@ public class BitstampController {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
+//        System.out.println("balance :" + response.body());
         return response.body();
     }
 
