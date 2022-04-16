@@ -13,7 +13,7 @@
 <div th:replace="fragments/layout :: header"></div>
 <div class="container">
     <h1>Crytocurrencies</h1>
-        <table id="dtBasicExample" class="table table-dark">
+        <table id="dtBasicExample" class="table table-dark table-striped table-hover">
             <thead>
                 <tr>
                     <th scope="col">Name</th>
@@ -78,7 +78,7 @@
             </tbody>
         </table>
     <div th:switch="${pagination}">
-        <p th:case="1">
+        <p th:case="1" th:class="pagination">
             Pagination :
             &nbsp;&nbsp;
             <a th:href="@{/bitstamp/pagination/{totalPagination}/1(totalPagination=${pagination})}">1</a>
@@ -101,7 +101,7 @@
             &nbsp;&nbsp;
             10
         </p>
-        <p th:case="2">
+        <p th:case="2" th:class="pagination">
             Pagination :
             &nbsp;&nbsp;
             <a th:href="@{/bitstamp/pagination/{totalPagination}/1(totalPagination=${pagination})}">1</a>
@@ -124,7 +124,7 @@
             &nbsp;&nbsp;
             10
         </p>
-        <p th:case="3">
+        <p th:case="3" th:class="pagination">
             Pagination :
             &nbsp;&nbsp;
             <a th:href="@{/bitstamp/pagination/{totalPagination}/1(totalPagination=${pagination})}">1</a>
@@ -147,7 +147,7 @@
             &nbsp;&nbsp;
             10
         </p>
-        <p th:case="4">
+        <p th:case="4" th:class="pagination">
             Pagination :
             &nbsp;&nbsp;
             <a th:href="@{/bitstamp/pagination/{totalPagination}/1(totalPagination=${pagination})}">1</a>
@@ -170,7 +170,7 @@
             &nbsp;&nbsp;
             10
         </p>
-        <p th:case="5">
+        <p th:case="5" th:class="pagination">
             Pagination :
             &nbsp;&nbsp;
             <a th:href="@{/bitstamp/pagination/{totalPagination}/1(totalPagination=${pagination})}">1</a>
@@ -193,7 +193,7 @@
             &nbsp;&nbsp;
             10
         </p>
-        <p th:case="6">
+        <p th:case="6" th:class="pagination">
             Pagination :
             &nbsp;&nbsp;
             <a th:href="@{/bitstamp/pagination/{totalPagination}/1(totalPagination=${pagination})}">1</a>
@@ -216,7 +216,7 @@
             &nbsp;&nbsp;
             10
         </p>
-        <p th:case="7">
+        <p th:case="7" th:class="pagination">
             Pagination :
             &nbsp;&nbsp;
             <a th:href="@{/bitstamp/pagination/{totalPagination}/1(totalPagination=${pagination})}">1</a>
@@ -239,7 +239,7 @@
             &nbsp;&nbsp;
             10
         </p>
-        <p th:case="8">
+        <p th:case="8" th:class="pagination">
             Pagination :
             &nbsp;&nbsp;
             <a th:href="@{/bitstamp/pagination/{totalPagination}/1(totalPagination=${pagination})}">1</a>
@@ -262,7 +262,7 @@
             &nbsp;&nbsp;
             10
         </p>
-        <p th:case="9">
+        <p th:case="9" th:class="pagination">
             Pagination :
             &nbsp;&nbsp;
             <a th:href="@{/bitstamp/pagination/{totalPagination}/1(totalPagination=${pagination})}">1</a>
@@ -285,7 +285,7 @@
             &nbsp;&nbsp;
             10
         </p>
-        <p th:case="10">
+        <p th:case="10" th:class="pagination">
             Pagination :
             &nbsp;&nbsp;
             <a th:href="@{/bitstamp/pagination/{totalPagination}/1(totalPagination=${pagination})}">1</a>
@@ -308,8 +308,9 @@
             &nbsp;&nbsp;
             <a th:href="@{/bitstamp/pagination/{totalPagination}/10(totalPagination=${pagination})}">10</a>
         </p>
-        <p th:case="*">No pagination</p>
+        <p th:case="*" th:class="pagination">No pagination</p>
     </div>
+    <br><br>
     <h1>Cash Flow</h1>
     <table id="dtBasicExample2" class="table table-dark">
         <thead>
@@ -327,6 +328,7 @@
         </tr>
         </tbody>
     </table>
+    <br><br>
     <h1>Last Sold Cryptocurrencies</h1>
     <table id="dtBasicExample3" class="table table-dark">
         <thead>
