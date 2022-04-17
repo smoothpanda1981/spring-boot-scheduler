@@ -359,29 +359,71 @@
         <p th:case="*" th:class="pagination">No pagination</p>
     </div>
     <br><br>
-    <h1>Last Sold Cryptocurrencies</h1>
-    <table id="dtBasicExample4" class="table table-dark table-striped table-hover">
-        <thead>
-        <tr>
-            <th scope="col">Date</th>
-            <th scope="col">Name</th>
-            <th scope="col">Sold Price</th>
-            <th scope="col">Current Price</th>
-            <th scope="col">Amount</th>
-            <th scope="col">Total</th>
-            <th scope="col">Fee</th>
-        </tr>
-        </thead>
+    <h1>Latest Bought And Sold Cryptocurrencies</h1>
+    <table>
         <tbody>
-        <tr th:each="balanceList : ${balanceList7}">
-            <td th:text="${balanceList.datetime}"></td>
-            <td th:text="${balanceList.cryptoUsdName}"></td>
-            <td th:text="${balanceList.cryptoUsd}"></td>
-            <td th:text="${balanceList.currentPrice}"></td>
-            <td th:text="${balanceList.cryptoAmount}"></td>
-            <td th:text="${balanceList.usd}"></td>
-            <td th:text="${balanceList.fee}"></td>
-        </tr>
+            <tr>
+                <td>
+                    <table id="dtBasicExample4" class="table table-dark table-striped table-hover">
+                        <thead>
+                        <tr>
+                            <th scope="col">Date</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Sold Price</th>
+                            <th scope="col">Current Price</th>
+                            <!--<th scope="col">Amount</th>-->
+                            <th scope="col">Total</th>
+                            <th scope="col">Fee</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="balanceList : ${balanceList8}">
+                            <td th:text="${balanceList.datetime}"></td>
+                            <td th:text="${balanceList.cryptoUsdName}"></td>
+                            <td th:text="${balanceList.cryptoUsd}"></td>
+                            <td th:text="${balanceList.currentPrice}"></td>
+                            <!--<td th:text="${balanceList.cryptoAmount}"></td>-->
+                            <td th:text="${balanceList.usd}"></td>
+                            <td th:text="${balanceList.fee}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </td>
+                <td>&nbsp;&nbsp;&nbsp;</td>
+                <td>&nbsp;&nbsp;&nbsp;</td>
+                <td>&nbsp;&nbsp;&nbsp;</td>
+                <td>&nbsp;&nbsp;&nbsp;</td>
+                <td>&nbsp;&nbsp;&nbsp;</td>
+                <td>&nbsp;&nbsp;&nbsp;</td>
+                <td>&nbsp;&nbsp;&nbsp;</td>
+                <td>&nbsp;&nbsp;&nbsp;</td>
+                <td>
+                    <table id="dtBasicExample5" class="table table-dark table-striped table-hover">
+                        <thead>
+                        <tr>
+                            <th scope="col">Date</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Sold Price</th>
+                            <th scope="col">Current Price</th>
+                            <!--<th scope="col">Amount</th>-->
+                            <th scope="col">Total</th>
+                            <th scope="col">Fee</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="balanceList : ${balanceList7}">
+                            <td th:text="${balanceList.datetime}"></td>
+                            <td th:text="${balanceList.cryptoUsdName}"></td>
+                            <td th:text="${balanceList.cryptoUsd}"></td>
+                            <td th:text="${balanceList.currentPrice}"></td>
+                           <!-- <td th:text="${balanceList.cryptoAmount}"></td>-->
+                            <td th:text="${balanceList.usd}"></td>
+                            <td th:text="${balanceList.fee}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
         </tbody>
     </table>
 </div>

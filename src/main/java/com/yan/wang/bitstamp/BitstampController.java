@@ -206,13 +206,20 @@ public class BitstampController {
                 }
             }
 
-
             List<UserTransaction> userTransactionList = new ArrayList<UserTransaction>();
+            List<UserTransaction> userTransactionBoughtList = new ArrayList<UserTransaction>();
             String resultTemp = getUserTransactions(props).replace(" ", "");
             String resultSub = resultTemp.substring(2, resultTemp.length()-2);
             String[] resultSubTab = resultSub.split("\\},\\{");
             for (int i = 0; i < resultSubTab.length; i++) {
-                if (resultSubTab[i].contains("\"type\":\"2\"") && resultSubTab[i].contains("\"order_id\"") && resultSubTab[i].contains("\"fee\"") && resultSubTab[i].contains("\"usd\"")) {
+                System.out.println("resultSubTab[" + i + "] :" + resultSubTab[i]);
+                if (resultSubTab[i].contains("\"type\":\"2\"")
+                        && resultSubTab[i].contains("\"order_id\"")
+                        && resultSubTab[i].contains("\"fee\"")
+                        && resultSubTab[i].contains("\"usd\"")
+                        && !resultSubTab[i].contains("\"bch\"")
+                        && !resultSubTab[i].contains("_eur\"")
+                        && !resultSubTab[i].contains("_btc\"")) {
                     String[] oneRowTab = resultSubTab[i].split(",");
                     boolean show = false;
                     for (int j = 0; j < oneRowTab.length; j++) {
@@ -225,7 +232,7 @@ public class BitstampController {
                             }
                         }
                     }
-                    if (show) {
+
                         UserTransaction userTransaction = new UserTransaction();
                         String userTransactionString = resultSubTab[i];
                         String[] userTransactionTab = userTransactionString.split(",");
@@ -237,7 +244,7 @@ public class BitstampController {
                                 Double usd = Double.parseDouble(userTransactionObjTab[1].substring(1, userTransactionObjTab[1].length() - 1));
                                 DecimalFormat df = new DecimalFormat("0.00");
                                 userTransaction.setUsd(df.format(usd));
-                            } else if (userTransactionObjTab[0].equals("\"order_i d\"")) {
+                            } else if (userTransactionObjTab[0].equals("\"order_id\"")) {
                                 userTransaction.setOrderId(userTransactionObjTab[1]);
                             } else if (userTransactionObjTab[0].contains("_usd")) {
                                 Double cryptoUsd = Double.parseDouble(userTransactionObjTab[1]);
@@ -271,8 +278,13 @@ public class BitstampController {
                                 }
                             }
                         }
-                        userTransactionList.add(userTransaction);
-                    }
+                        if (show) {
+                            userTransactionList.add(userTransaction);
+                        } else {
+                            userTransactionBoughtList.add(userTransaction);
+                        }
+                } else {
+                    System.out.println("excluded => resultSubTab[" + i + "] :" + resultSubTab[i]);
                 }
             }
 
@@ -299,6 +311,29 @@ public class BitstampController {
                 userTransaction.setCurrentPrice(ticker.getLast());
             }
 
+            Set<String> cryptoNameSetBought = new HashSet<String>();
+            for (UserTransaction userTransaction : userTransactionBoughtList) {
+                String key = userTransaction.getCryptoUsdName();
+                if (!cryptoNameSetBought.contains(key)) {
+                    cryptoNameSetBought.add(key);
+                }
+            }
+
+            List<UserTransaction> sortedUserTransactionBoughtList = new ArrayList<UserTransaction>();
+            for (UserTransaction userTransaction : userTransactionBoughtList) {
+                String cryptoUsdName = userTransaction.getCryptoUsdName();
+                if (cryptoNameSetBought.contains(cryptoUsdName)) {
+                    sortedUserTransactionBoughtList.add(userTransaction);
+                    cryptoNameSetBought.remove(cryptoUsdName);
+                }
+            }
+
+            for (UserTransaction userTransaction : sortedUserTransactionBoughtList) {
+                String crypto = userTransaction.getCryptoUsdName().replace("_", "");
+                Ticker ticker = getTicker(crypto);
+                userTransaction.setCurrentPrice(ticker.getLast());
+            }
+
             bitstampService.saveBalanceList(balanceList5);
             List<BalanceForIA> balanceForIAList = copyBalanceListIntoBalanceForIAList(balanceList5);
             bitstampService.saveBalanceListInIA(balanceForIAList);
@@ -308,7 +343,20 @@ public class BitstampController {
             modelAndView.addObject("balanceList5", balanceList5);
             modelAndView.addObject("balanceList6a", balanceList6a);
             modelAndView.addObject("balanceList6b", balanceList6b);
-            modelAndView.addObject("balanceList7", sortedUserTransactionList);
+
+            int sortedUserTransactionListSize = sortedUserTransactionList.size();
+            int sortedUserTransactionBoughtListSize = sortedUserTransactionBoughtList.size();
+            if (sortedUserTransactionListSize > sortedUserTransactionBoughtListSize) {
+                modelAndView.addObject("balanceList7", sortedUserTransactionList.subList(0, sortedUserTransactionBoughtListSize));
+                modelAndView.addObject("balanceList8", sortedUserTransactionBoughtList);
+            } else if (sortedUserTransactionListSize < sortedUserTransactionBoughtListSize) {
+                modelAndView.addObject("balanceList7", sortedUserTransactionList);
+                modelAndView.addObject("balanceList8", sortedUserTransactionBoughtList.subList(0, sortedUserTransactionListSize));
+            } else {
+                modelAndView.addObject("balanceList7", sortedUserTransactionList);
+                modelAndView.addObject("balanceList8", sortedUserTransactionBoughtList);
+            }
+
 
             if (pagination == 12) {
                 // delete in database
