@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <link href="../../../resources/css/bootstrap.min.css" rel="stylesheet" media="screen" th:href="@{/resources/css/bootstrap.min.css}"/>
+</head>
+<body>
+
+<div th:fragment="cashflow">
+    <h1>Cash flow</h1>
+    <table>
+        <tbody>
+        <tr>
+            <td>
+                <table id="dtBasicExample1" class="table table-dark table-striped table-hover table-borderless">
+                    <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Portfolio</th>
+                        <th scope="col">Value</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="balanceList : ${balanceList6a}">
+                        <td th:text="${balanceList.name}"></td>
+                        <td th:text="${balanceList.portfolioName}"></td>
+                        <td th:text="${balanceList.value}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </td>
+            <td>&nbsp;&nbsp;&nbsp;</td>
+            <td>&nbsp;&nbsp;&nbsp;</td>
+            <td>&nbsp;&nbsp;&nbsp;</td>
+            <td>&nbsp;&nbsp;&nbsp;</td>
+            <td>
+                <table id="dtBasicExample2" class="table table-dark table-striped table-hover table-borderless">
+                    <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Portfolio</th>
+                        <th scope="col">Value</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="balanceList : ${balanceList6b}">
+                        <td th:text="${balanceList.name}"></td>
+                        <td th:text="${balanceList.portfolioName}"></td>
+                        <td th:text="${balanceList.value}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>
