@@ -20,7 +20,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="balanceList : ${balanceList6a}">
+                    <tr th:each="balanceList : ${cashFlowMainPortfolio}">
                         <td th:text="${balanceList.name}"></td>
                         <td th:text="${balanceList.portfolioName}"></td>
                         <td th:text="${balanceList.value}"></td>
@@ -42,7 +42,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="balanceList : ${balanceList6b}">
+                    <tr th:each="balanceList : ${cashFlowProfitsPortfolio}">
                         <td th:text="${balanceList.name}"></td>
                         <td th:text="${balanceList.portfolioName}"></td>
                         <td th:text="${balanceList.value}"></td>

@@ -161,9 +161,9 @@ public class BitstampController {
                 }
             }
 
-            List<Balance> balanceList5 = new ArrayList<Balance>();
-            List<Balance> balanceList6a = new ArrayList<Balance>();
-            List<Balance> balanceList6b = new ArrayList<Balance>();
+            List<Balance> crytocurrenciesList = new ArrayList<Balance>();
+            List<Balance> cashFlowMainPortfolio = new ArrayList<Balance>();
+            List<Balance> cashFlowProfitsPortfolio = new ArrayList<Balance>();
             Integer pagination = bitstampService.getPagination();
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             LocalDateTime now = LocalDateTime.now(ZoneId.of("GMT+01:00"));
@@ -197,12 +197,12 @@ public class BitstampController {
 
                 if (balance.getName().startsWith("usd_") || balance.getName().startsWith("eur_")) {
                     if (balance.getPortfolioName().equals("Main")) {
-                        balanceList6a.add(balance5);
+                        cashFlowMainPortfolio.add(balance5);
                     } else {
-                        balanceList6b.add(balance5);
+                        cashFlowProfitsPortfolio.add(balance5);
                     }
                 } else {
-                    balanceList5.add(balance5);
+                    crytocurrenciesList.add(balance5);
                 }
             }
 
@@ -309,6 +309,21 @@ public class BitstampController {
                 String crypto = userTransaction.getCryptoUsdName().replace("_", "");
                 Ticker ticker = getTicker(crypto);
                 userTransaction.setCurrentPrice(ticker.getLast());
+
+                Double soldPrice = Double.parseDouble(userTransaction.getCryptoUsd());
+                Double currentPrice = Double.parseDouble(userTransaction.getCurrentPrice());
+                Double fee = Double.parseDouble(userTransaction.getFee());
+                Double amount = Double.parseDouble(userTransaction.getCryptoAmount());
+                Double profitAndLoss = ((currentPrice * amount) - fee) - (soldPrice * amount) + fee;
+                DecimalFormat df = new DecimalFormat("0.00");
+                userTransaction.setProfitAndLoss(df.format(profitAndLoss));
+                if (profitAndLoss > 0.00) {
+                    userTransaction.setProfitAndLossFlag("green");
+                } else if (profitAndLoss == 0.00) {
+                    userTransaction.setProfitAndLossFlag("black");
+                } else {
+                    userTransaction.setProfitAndLossFlag("red");
+                }
             }
 
             Set<String> cryptoNameSetBought = new HashSet<String>();
@@ -332,29 +347,44 @@ public class BitstampController {
                 String crypto = userTransaction.getCryptoUsdName().replace("_", "");
                 Ticker ticker = getTicker(crypto);
                 userTransaction.setCurrentPrice(ticker.getLast());
+
+                Double soldPrice = Double.parseDouble(userTransaction.getCryptoUsd());
+                Double currentPrice = Double.parseDouble(userTransaction.getCurrentPrice());
+                Double fee = Double.parseDouble(userTransaction.getFee());
+                Double amount = Double.parseDouble(userTransaction.getCryptoAmount());
+                Double profitAndLoss = ((currentPrice * amount) - fee) - (soldPrice * amount) + fee;
+                DecimalFormat df = new DecimalFormat("0.00");
+                userTransaction.setProfitAndLoss(df.format(profitAndLoss));
+                if (profitAndLoss > 0.00) {
+                    userTransaction.setProfitAndLossFlag("green");
+                } else if (profitAndLoss == 0.00) {
+                    userTransaction.setProfitAndLossFlag("black");
+                } else {
+                    userTransaction.setProfitAndLossFlag("red");
+                }
             }
 
-            bitstampService.saveBalanceList(balanceList5);
-            List<BalanceForIA> balanceForIAList = copyBalanceListIntoBalanceForIAList(balanceList5);
+            bitstampService.saveBalanceList(crytocurrenciesList);
+            List<BalanceForIA> balanceForIAList = copyBalanceListIntoBalanceForIAList(crytocurrenciesList);
             bitstampService.saveBalanceListInIA(balanceForIAList);
 
 
             ModelAndView modelAndView = new ModelAndView("bitstamp/bitstamp");
-            modelAndView.addObject("balanceList5", balanceList5);
-            modelAndView.addObject("balanceList6a", balanceList6a);
-            modelAndView.addObject("balanceList6b", balanceList6b);
+            modelAndView.addObject("crytocurrenciesList", crytocurrenciesList);
+            modelAndView.addObject("cashFlowMainPortfolio", cashFlowMainPortfolio);
+            modelAndView.addObject("cashFlowProfitsPortfolio", cashFlowProfitsPortfolio);
 
             int sortedUserTransactionListSize = sortedUserTransactionList.size();
             int sortedUserTransactionBoughtListSize = sortedUserTransactionBoughtList.size();
             if (sortedUserTransactionListSize > sortedUserTransactionBoughtListSize) {
-                modelAndView.addObject("balanceList7", sortedUserTransactionList.subList(0, sortedUserTransactionBoughtListSize));
-                modelAndView.addObject("balanceList8", sortedUserTransactionBoughtList);
+                modelAndView.addObject("sortedUserTransactionSoldList", sortedUserTransactionList.subList(0, sortedUserTransactionBoughtListSize));
+                modelAndView.addObject("sortedUserTransactionBoughtList", sortedUserTransactionBoughtList);
             } else if (sortedUserTransactionListSize < sortedUserTransactionBoughtListSize) {
-                modelAndView.addObject("balanceList7", sortedUserTransactionList);
-                modelAndView.addObject("balanceList8", sortedUserTransactionBoughtList.subList(0, sortedUserTransactionListSize));
+                modelAndView.addObject("sortedUserTransactionSoldList", sortedUserTransactionList);
+                modelAndView.addObject("sortedUserTransactionBoughtList", sortedUserTransactionBoughtList.subList(0, sortedUserTransactionListSize));
             } else {
-                modelAndView.addObject("balanceList7", sortedUserTransactionList);
-                modelAndView.addObject("balanceList8", sortedUserTransactionBoughtList);
+                modelAndView.addObject("sortedUserTransactionSoldList", sortedUserTransactionList);
+                modelAndView.addObject("sortedUserTransactionBoughtList", sortedUserTransactionBoughtList);
             }
 
 

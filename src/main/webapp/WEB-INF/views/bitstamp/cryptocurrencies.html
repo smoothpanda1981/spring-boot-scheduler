@@ -27,7 +27,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:each="balanceList : ${balanceList5}">
+        <tr th:each="balanceList : ${crytocurrenciesList}">
             <form th:target="_blank" th:action="@{/bitstamp/chart/{cryptoId}(cryptoId=${balanceList.name})}" th:object="${paidPriceObject}" method="POST">
                 <td th:text="${balanceList.name}"></td>
                 <td th:text="${balanceList.portfolioName}"></td>

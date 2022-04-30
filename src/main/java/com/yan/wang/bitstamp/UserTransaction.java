@@ -14,6 +14,8 @@ public class UserTransaction {
     private String id;
     private String eur;
     private String currentPrice;
+    private String profitAndLoss;
+    private String profitAndLossFlag;
 
     public String getUsd() {
         return usd;
@@ -117,5 +119,21 @@ public class UserTransaction {
 
     public void setCurrentPrice(String currentPrice) {
         this.currentPrice = currentPrice;
+    }
+
+    public String getProfitAndLoss() {
+        return profitAndLoss;
+    }
+
+    public void setProfitAndLoss(String profitAndLoss) {
+        this.profitAndLoss = profitAndLoss;
+    }
+
+    public String getProfitAndLossFlag() {
+        return profitAndLossFlag;
+    }
+
+    public void setProfitAndLossFlag(String profitAndLossFlag) {
+        this.profitAndLossFlag = profitAndLossFlag;
     }
 }

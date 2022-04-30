@@ -21,10 +21,11 @@
                         <!--<th scope="col">Amount</th>-->
                         <th scope="col">Total</th>
                         <th scope="col">Fee</th>
+                        <th scope="col">P/L</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="balanceList : ${balanceList8}">
+                    <tr th:each="balanceList : ${sortedUserTransactionBoughtList}">
                         <td th:text="${balanceList.datetime}"></td>
                         <td th:text="${balanceList.cryptoUsdName}"></td>
                         <td th:text="${balanceList.cryptoUsd}"></td>
@@ -32,6 +33,11 @@
                         <!--<td th:text="${balanceList.cryptoAmount}"></td>-->
                         <td th:text="${balanceList.usd}"></td>
                         <td th:text="${balanceList.fee}"></td>
+                        <td th:switch="${balanceList.profitAndLossFlag}">
+                            <span th:case="'black'" th:text="${balanceList.priceUpDownPercent}"></span>
+                            <span th:case="'red'" th:style="'color:red'" th:text="${balanceList.profitAndLoss}"></span>
+                            <span th:case="'green'" th:style="'color:green'" th:text="${balanceList.profitAndLoss}"></span>
+                        </td>
                     </tr>
                     </tbody>
                 </table>
@@ -55,10 +61,11 @@
                         <!--<th scope="col">Amount</th>-->
                         <th scope="col">Total</th>
                         <th scope="col">Fee</th>
+                        <th scope="col">P/L</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="balanceList : ${balanceList7}">
+                    <tr th:each="balanceList : ${sortedUserTransactionSoldList}">
                         <td th:text="${balanceList.datetime}"></td>
                         <td th:text="${balanceList.cryptoUsdName}"></td>
                         <td th:text="${balanceList.cryptoUsd}"></td>
@@ -66,6 +73,11 @@
                         <!-- <td th:text="${balanceList.cryptoAmount}"></td>-->
                         <td th:text="${balanceList.usd}"></td>
                         <td th:text="${balanceList.fee}"></td>
+                        <td th:switch="${balanceList.profitAndLossFlag}">
+                            <span th:case="'black'" th:text="${balanceList.priceUpDownPercent}"></span>
+                            <span th:case="'red'" th:style="'color:red'" th:text="${balanceList.profitAndLoss}"></span>
+                            <span th:case="'green'" th:style="'color:green'" th:text="${balanceList.profitAndLoss}"></span>
+                        </td>
                     </tr>
                     </tbody>
                 </table>
