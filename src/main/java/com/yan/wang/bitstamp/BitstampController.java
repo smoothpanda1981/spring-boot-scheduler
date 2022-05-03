@@ -63,111 +63,20 @@ public class BitstampController {
             props.load(new FileInputStream("/home/ywang/bitstamp/bitstampapi.properties"));
             String result = getMainBalance(props).replace(" ", "");
 
-            String subResult = result.substring(1, result.length()-1);
-            String str[] = subResult.split(",");
-            List<String> arrayList = new ArrayList<String>();
-            arrayList = Arrays.asList(str);
-            List<Balance> balanceList = new ArrayList<Balance>();
-            for (String s : arrayList) {
-                String tab[] = s.split(":");
-                String name = tab[0].substring(1, tab[0].length()-1);
-                String value = tab[1].substring(1, tab[1].length()-1);
-                if (name.contains("_balance")) {
-                    if (!value.equals("0.00000000") && !value.equals("0.00000") && !value.equals("0.00") && !value.equals("0")) {
-                        Balance balance = new Balance();
-                        balance.setName(name);
-                        balance.setValue(value);
-                        balanceList.add(balance);
-                    }
-                }
-            }
+            List<Balance> balanceList = getBalanceList(result);
+            List<Balance> balanceList2 = getBalanceList2(balanceList);
+            List<Balance> balanceList3 = getBalanceList3(balanceList2, props);
+            List<Balance> balanceList4 = getBalanceList4(balanceList3, props);
 
-            List<Balance> balanceList2 = new ArrayList<Balance>();
-            for (Balance balance : balanceList) {
-                if (!balance.getName().contains("usd") && !balance.getName().contains("eur")) {
-                    Balance balance2 = new Balance();
-                    balance2.setName(balance.getName());
-                    balance2.setValue(balance.getValue());
-                    Ticker ticker = getTicker(balance);
-                    balance2.setCurrentPrice(ticker.getLast());
-                    balance2.setLast24Low(ticker.getLow());
-                    balance2.setLast24High(ticker.getHigh());
-                    balance2.setLast24Volume(ticker.getVolume());
-                    balanceList2.add(balance2);
-                } else {
-                    balance.setCurrentPrice("-");
-                    balance.setLast24Low("-");
-                    balance.setLast24High("-");
-                    balance.setLast24Volume("-");
-                    balanceList2.add(balance);
-                }
-            }
 
-            List<Balance> balanceList3 = new ArrayList<Balance>();
-            for (Balance balance : balanceList2) {
-                Balance balance3 = new Balance();
-                balance3.setName(balance.getName());
-                balance3.setValue(balance.getValue());
-                balance3.setCurrentPrice(balance.getCurrentPrice());
-                balance3.setLast24Low(balance.getLast24Low());
-                balance3.setLast24High(balance.getLast24High());
-                balance3.setLast24Volume(balance.getLast24Volume());
-                balance3.setPaidPrice(getPaidPrice(props, balance.getName()));
-                balanceList3.add(balance3);
-            }
-
-            List<Balance> balanceList4 = new ArrayList<Balance>();
-            for (Balance balance : balanceList3) {
-                Balance balance4 = new Balance();
-                balance4.setName(balance.getName());
-                balance4.setValue(balance.getValue());
-                balance4.setCurrentPrice(balance.getCurrentPrice());
-                balance4.setLast24Low(balance.getLast24Low());
-                balance4.setLast24High(balance.getLast24High());
-                balance4.setLast24Volume(balance.getLast24Volume());
-                balance4.setPaidPrice(balance.getPaidPrice());
-                balance4.setAmountSpendToBuy(computeAmountSpendToBuy(balance.getValue(), balance.getPaidPrice()));
-                balance4.setProfitOrLossValue(computeProfitOrLossAsValue(balance.getPaidPrice(), balance.getCurrentPrice(), balance.getValue()));
-                balance4.setProfitOrLossPercentage(computeProfitOrLossCurrentPrice(balance.getCurrentPrice(), balance.getPaidPrice()));
-                balance4.setPriceUpDownPercent(computeUpDownPercentage(balance.getPaidPrice(), balance.getCurrentPrice()));
-                balance4.setPortfolioName("Main");
-                balanceList4.add(balance4);
-            }
-
-            String result2 = getProfitsBalance(props).replace(" ", "");
-            String subResult2 = result2.substring(1, result2.length()-1);
-            String str2[] = subResult2.split(",");
-            List<String> arrayList2 = new ArrayList<String>();
-            arrayList2 = Arrays.asList(str2);
-            for (String s : arrayList2) {
-                String tab[] = s.split(":");
-                String name = tab[0].substring(1, tab[0].length()-1);
-                String value = tab[1].substring(1, tab[1].length()-1);
-                if (name.equals("eur_balance") || name.equals("usd_balance")) {
-                        Balance balance = new Balance();
-                        balance.setName(name);
-                        balance.setValue(value);
-                        balance.setPaidPrice("-");
-                        balance.setCurrentPrice("-");
-                        balance.setLast24Low("-");
-                        balance.setLast24High("-");
-                        balance.setLast24Volume("-");
-                        balance.setAmountSpendToBuy("-");
-                        balance.setProfitOrLossValue("-");
-                        balance.setProfitOrLossPercentage("-");
-                        balance.setPriceUpDownPercent("-");
-                        balance.setPortfolioName("Profits");
-                        balanceList4.add(balance);
-                }
-            }
-
-            List<Balance> crytocurrenciesList = new ArrayList<Balance>();
+            List<Balance> cryptocurrenciesList = new ArrayList<Balance>();
             List<Balance> cashFlowMainPortfolio = new ArrayList<Balance>();
             List<Balance> cashFlowProfitsPortfolio = new ArrayList<Balance>();
             Integer pagination = bitstampService.getPagination();
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             LocalDateTime now = LocalDateTime.now(ZoneId.of("GMT+01:00"));
             String datePagination = dtf.format(now);
+
             for (Balance balance : balanceList4) {
                 Balance balance5 = new Balance();
                 balance5.setName(balance.getName());
@@ -202,7 +111,7 @@ public class BitstampController {
                         cashFlowProfitsPortfolio.add(balance5);
                     }
                 } else {
-                    crytocurrenciesList.add(balance5);
+                    cryptocurrenciesList.add(balance5);
                 }
             }
 
@@ -364,13 +273,13 @@ public class BitstampController {
                 }
             }
 
-            bitstampService.saveBalanceList(crytocurrenciesList);
-            List<BalanceForIA> balanceForIAList = copyBalanceListIntoBalanceForIAList(crytocurrenciesList);
+            bitstampService.saveBalanceList(cryptocurrenciesList);
+            List<BalanceForIA> balanceForIAList = copyBalanceListIntoBalanceForIAList(cryptocurrenciesList);
             bitstampService.saveBalanceListInIA(balanceForIAList);
 
 
             ModelAndView modelAndView = new ModelAndView("bitstamp/bitstamp");
-            modelAndView.addObject("crytocurrenciesList", crytocurrenciesList);
+            modelAndView.addObject("crytocurrenciesList", cryptocurrenciesList);
             modelAndView.addObject("cashFlowMainPortfolio", cashFlowMainPortfolio);
             modelAndView.addObject("cashFlowProfitsPortfolio", cashFlowProfitsPortfolio);
 
@@ -1147,5 +1056,121 @@ public class BitstampController {
             balanceForIAList.add(balanceForIA);
         }
         return balanceForIAList;
+    }
+
+    public List<Balance> getBalanceList(String result) {
+        List<Balance> balanceList = new ArrayList<Balance>();
+
+        String subResult = result.substring(1, result.length()-1);
+        String str[] = subResult.split(",");
+        List<String> arrayList = new ArrayList<String>();
+        arrayList = Arrays.asList(str);
+
+        for (String s : arrayList) {
+            String tab[] = s.split(":");
+            String name = tab[0].substring(1, tab[0].length()-1);
+            String value = tab[1].substring(1, tab[1].length()-1);
+            if (name.contains("_balance")) {
+                if (!value.equals("0.00000000") && !value.equals("0.00000") && !value.equals("0.00") && !value.equals("0")) {
+                    Balance balance = new Balance();
+                    balance.setName(name);
+                    balance.setValue(value);
+                    balanceList.add(balance);
+                }
+            }
+        }
+        return balanceList;
+    }
+
+    public List<Balance> getBalanceList2(List<Balance> balanceList) throws IOException {
+        List<Balance> balanceList2 = new ArrayList<Balance>();
+        for (Balance balance : balanceList) {
+            if (!balance.getName().contains("usd") && !balance.getName().contains("eur")) {
+                Balance balance2 = new Balance();
+                balance2.setName(balance.getName());
+                balance2.setValue(balance.getValue());
+                Ticker ticker = getTicker(balance);
+                balance2.setCurrentPrice(ticker.getLast());
+                balance2.setLast24Low(ticker.getLow());
+                balance2.setLast24High(ticker.getHigh());
+                balance2.setLast24Volume(ticker.getVolume());
+                balanceList2.add(balance2);
+            } else {
+                balance.setCurrentPrice("-");
+                balance.setLast24Low("-");
+                balance.setLast24High("-");
+                balance.setLast24Volume("-");
+                balanceList2.add(balance);
+            }
+        }
+        return balanceList2;
+    }
+
+    public List<Balance> getBalanceList3(List<Balance> balanceList2, Properties props) {
+        List<Balance> balanceList3 = new ArrayList<Balance>();
+        for (Balance balance : balanceList2) {
+            Balance balance3 = new Balance();
+            balance3.setName(balance.getName());
+            balance3.setValue(balance.getValue());
+            balance3.setCurrentPrice(balance.getCurrentPrice());
+            balance3.setLast24Low(balance.getLast24Low());
+            balance3.setLast24High(balance.getLast24High());
+            balance3.setLast24Volume(balance.getLast24Volume());
+            balance3.setPaidPrice(getPaidPrice(props, balance.getName()));
+            balanceList3.add(balance3);
+        }
+        return balanceList3;
+    }
+
+    public List<Balance> getBalanceList4(List<Balance> balanceList3, Properties props) throws NoSuchAlgorithmException, IOException, InvalidKeyException, InterruptedException {
+        List<Balance> balanceList4 = new ArrayList<Balance>();
+        for (Balance balance : balanceList3) {
+            Balance balance4 = new Balance();
+            balance4.setName(balance.getName());
+            balance4.setValue(balance.getValue());
+            balance4.setCurrentPrice(balance.getCurrentPrice());
+            balance4.setLast24Low(balance.getLast24Low());
+            balance4.setLast24High(balance.getLast24High());
+            balance4.setLast24Volume(balance.getLast24Volume());
+            balance4.setPaidPrice(balance.getPaidPrice());
+            balance4.setAmountSpendToBuy(computeAmountSpendToBuy(balance.getValue(), balance.getPaidPrice()));
+            balance4.setProfitOrLossValue(computeProfitOrLossAsValue(balance.getPaidPrice(), balance.getCurrentPrice(), balance.getValue()));
+            balance4.setProfitOrLossPercentage(computeProfitOrLossCurrentPrice(balance.getCurrentPrice(), balance.getPaidPrice()));
+            balance4.setPriceUpDownPercent(computeUpDownPercentage(balance.getPaidPrice(), balance.getCurrentPrice()));
+            balance4.setPortfolioName("Main");
+            balanceList4.add(balance4);
+        }
+        String result2 = getProfitsBalance(props).replace(" ", "");
+        String subResult2 = result2.substring(1, result2.length()-1);
+        String str2[] = subResult2.split(",");
+        List<String> arrayList2 = new ArrayList<String>();
+        arrayList2 = Arrays.asList(str2);
+        for (String s : arrayList2) {
+            String tab[] = s.split(":");
+            String name = tab[0].substring(1, tab[0].length()-1);
+            String value = tab[1].substring(1, tab[1].length()-1);
+            if (name.equals("eur_balance") || name.equals("usd_balance")) {
+                Balance balance = new Balance();
+                balance.setName(name);
+                balance.setValue(value);
+                balance.setPaidPrice("-");
+                balance.setCurrentPrice("-");
+                balance.setLast24Low("-");
+                balance.setLast24High("-");
+                balance.setLast24Volume("-");
+                balance.setAmountSpendToBuy("-");
+                balance.setProfitOrLossValue("-");
+                balance.setProfitOrLossPercentage("-");
+                balance.setPriceUpDownPercent("-");
+                balance.setPortfolioName("Profits");
+                balanceList4.add(balance);
+            }
+        }
+
+        return balanceList4;
+    }
+
+    public SuperThreeLists getSuperThreeLists(List<Balance> balanceList4) {
+        return null;
     }
 }
