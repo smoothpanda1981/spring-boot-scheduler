@@ -46,6 +46,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.jfree.chart.ChartUtilities.writeChartAsJPEG;
 
@@ -204,6 +205,8 @@ public class BitstampController {
                     cryptoNameSet.add(key);
                 }
             }
+            List<String> cryptoNameList = List.copyOf(cryptoNameSet);
+            cryptoNameList = cryptoNameList.stream().sorted().collect(Collectors.toList());
 
             List<UserTransaction> sortedUserTransactionList = new ArrayList<UserTransaction>();
             for (UserTransaction userTransaction : userTransactionList) {
@@ -242,6 +245,8 @@ public class BitstampController {
                     cryptoNameSetBought.add(key);
                 }
             }
+            List<String> cryptoNameBoughtList = List.copyOf(cryptoNameSetBought);
+            cryptoNameBoughtList = cryptoNameBoughtList.stream().sorted().collect(Collectors.toList());
 
             List<UserTransaction> sortedUserTransactionBoughtList = new ArrayList<UserTransaction>();
             for (UserTransaction userTransaction : userTransactionBoughtList) {
@@ -322,6 +327,10 @@ public class BitstampController {
             StepBalance balance = new StepBalance();
             balance.setPagination(60);;
             modelAndView.addObject("paidPriceObject", balance);
+
+            modelAndView.addObject("cryptoNameSoldList", cryptoNameList);
+            modelAndView.addObject("cryptoNameBoughtList", cryptoNameBoughtList);
+
             return modelAndView;
 
         } catch (Exception e) {
