@@ -16,11 +16,11 @@
                         <tr>
                             <!--<form th:target="_blank" th:action="@{/bitstamp/lastboughtcrypto}" th:object="${paidPriceObject}" method="POST">&ndash;&gt;-->
                             <td>
-                                Select crypto name (buy):
+                                Select crypto name (buy & sell):
                             </td>
                             <td>
-                                <select name="cryptoBoughtName" id="cryptoBoughtName">
-                                    <option th:each="cryptoNameBought : ${cryptoNameBoughtList}" th:value="${cryptoNameBought}" th:text="${cryptoNameBought}"></option>
+                                <select name="cryptoBoughtAndSoldName" id="cryptoBoughtAndSoldName">
+                                    <option th:each="cryptoNameBoughtAndSold : ${cryptoNameBoughtAndSoldList}" th:value="${cryptoNameBoughtAndSold}" th:text="${cryptoNameBoughtAndSold}"></option>
                                 </select>
                             </td>
                             <td>
@@ -40,25 +40,6 @@
             <td>&nbsp;&nbsp;&nbsp;</td>
             <td>&nbsp;&nbsp;&nbsp;</td>
             <td>
-                <table id="dtBasicExample105" class="table table-dark table-striped table-hover">
-                    <tbody>
-                        <tr>
-                            <!--<form th:target="_blank" th:action="@{/bitstamp/lastboughtcrypto}" th:object="${paidPriceObject}" method="POST">&ndash;&gt;-->
-                            <td>
-                                Select crypto name (sell):
-                            </td>
-                            <td>
-                                <select name="cryptoSoldName" id="cryptoSoldName">
-                                    <option th:each="cryptoNameSold : ${cryptoNameSoldList}" th:value="${cryptoNameSold}" th:text="${cryptoNameSold}"></option>
-                                </select>
-                            </td>
-                            <td>
-                                <input type="submit" th:value="Generate" />
-                            </td>
-                            <!--</form>-->
-                        </tr>
-                    </tbody>
-                </table>
             </td>
         </tr>
         <tr>

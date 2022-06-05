@@ -206,7 +206,21 @@ public class BitstampController {
                 }
             }
             List<String> cryptoNameList = List.copyOf(cryptoNameSet);
-            cryptoNameList = cryptoNameList.stream().sorted().collect(Collectors.toList());
+
+            Set<String> cryptoNameSetBought = new HashSet<String>();
+            for (UserTransaction userTransaction : userTransactionBoughtList) {
+                String key = userTransaction.getCryptoUsdName();
+                if (!cryptoNameSetBought.contains(key)) {
+                    cryptoNameSetBought.add(key);
+                }
+            }
+            List<String> cryptoNameBoughtList = List.copyOf(cryptoNameSetBought);
+
+            Set<String> boughtAndSoldset = new LinkedHashSet<>(cryptoNameList);
+            boughtAndSoldset.addAll(cryptoNameBoughtList);
+            List<String> cryptoNameBoughtAndSoldList = new ArrayList<>(boughtAndSoldset);
+
+            cryptoNameBoughtAndSoldList = cryptoNameBoughtAndSoldList.stream().sorted().collect(Collectors.toList());
 
             List<UserTransaction> sortedUserTransactionList = new ArrayList<UserTransaction>();
             for (UserTransaction userTransaction : userTransactionList) {
@@ -238,15 +252,6 @@ public class BitstampController {
                 }
             }
 
-            Set<String> cryptoNameSetBought = new HashSet<String>();
-            for (UserTransaction userTransaction : userTransactionBoughtList) {
-                String key = userTransaction.getCryptoUsdName();
-                if (!cryptoNameSetBought.contains(key)) {
-                    cryptoNameSetBought.add(key);
-                }
-            }
-            List<String> cryptoNameBoughtList = List.copyOf(cryptoNameSetBought);
-            cryptoNameBoughtList = cryptoNameBoughtList.stream().sorted().collect(Collectors.toList());
 
             List<UserTransaction> sortedUserTransactionBoughtList = new ArrayList<UserTransaction>();
             for (UserTransaction userTransaction : userTransactionBoughtList) {
@@ -328,8 +333,8 @@ public class BitstampController {
             balance.setPagination(60);;
             modelAndView.addObject("paidPriceObject", balance);
 
-            modelAndView.addObject("cryptoNameSoldList", cryptoNameList);
-            modelAndView.addObject("cryptoNameBoughtList", cryptoNameBoughtList);
+            modelAndView.addObject("cryptoNameBoughtAndSoldList", cryptoNameBoughtAndSoldList);
+
 
             return modelAndView;
 
