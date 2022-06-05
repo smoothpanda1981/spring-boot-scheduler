@@ -6,14 +6,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.IOUtils;
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.time.Minute;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -26,7 +24,6 @@ import org.ta4j.core.num.Num;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -330,9 +327,11 @@ public class BitstampController {
             minuteurList.put("3 D", 259200);
             modelAndView.addObject("step", minuteurList);
             StepBalance balance = new StepBalance();
-            balance.setPagination(60);;
+            balance.setPagination(60);
             modelAndView.addObject("paidPriceObject", balance);
 
+            StepBalance cryptoNameForSelectBox = new StepBalance();
+            modelAndView.addObject("cryptoNameForSelectBox", cryptoNameForSelectBox);
             modelAndView.addObject("cryptoNameBoughtAndSoldList", cryptoNameBoughtAndSoldList);
 
 
@@ -423,6 +422,112 @@ public class BitstampController {
         balance.setPagination(60);;
         modelAndView.addObject("paidPriceObject", balance);
         return modelAndView;
+    }
+
+    @PostMapping(value = {"bitstamp/lastboughtcrypto"})
+    public ModelAndView showLastBoughtSoldTransactionsByCryptoName(@ModelAttribute("cryptoNameForSelectBox") Balance cryptoNameForSelectBox) {
+        System.out.println("pagination = " + cryptoNameForSelectBox.getName());
+
+        List<UserTransaction> userTransactionSoldList = new ArrayList<UserTransaction>();
+        List<UserTransaction> userTransactionBoughtList = new ArrayList<UserTransaction>();
+
+        try {
+            Properties props = new Properties();
+            props.load(new FileInputStream("/home/ywang/bitstamp/bitstampapi.properties"));
+
+            String resultTemp = getUserTransactions(props).replace(" ", "");
+            String resultSub = resultTemp.substring(2, resultTemp.length() - 2);
+            String[] resultSubTab = resultSub.split("\\},\\{");
+            for (int i = 0; i < resultSubTab.length; i++) {
+                if (resultSubTab[i].contains("\"type\":\"2\"")
+                        && resultSubTab[i].contains("\"order_id\"")
+                        && resultSubTab[i].contains("\"fee\"")
+                        && resultSubTab[i].contains("\"usd\"")
+                        && !resultSubTab[i].contains("\"bch\"")
+                        && !resultSubTab[i].contains("_eur\"")
+                        && !resultSubTab[i].contains("_btc\"")) {
+                    String[] oneRowTab = resultSubTab[i].split(",");
+                    boolean show = false;
+                    for (int j = 0; j < oneRowTab.length; j++) {
+                        if (oneRowTab[j].startsWith("\"usd\":\"")) {
+                            String[] subString = oneRowTab[j].split(":");
+                            String value = subString[1].substring(1, subString[1].length() - 1);
+                            Double d = Double.parseDouble(value);
+                            if (d > 0) {
+                                show = true;
+                            }
+                        }
+                    }
+
+                    UserTransaction userTransaction = new UserTransaction();
+                    String userTransactionString = resultSubTab[i];
+                    if (userTransactionString.contains(cryptoNameForSelectBox.getName())) {
+                        System.out.println("resultSubTab[" + i + "] :" + resultSubTab[i]);
+                        String[] userTransactionTab = userTransactionString.split(",");
+                        for (int k = 0; k < userTransactionTab.length; k++) {
+                            boolean goToElse = true;
+                            String userTransactionObj = userTransactionTab[k];
+                            String[] userTransactionObjTab = userTransactionObj.split(":");
+                            if (userTransactionObjTab[0].equals("\"usd\"")) {
+                                Double usd = Double.parseDouble(userTransactionObjTab[1].substring(1, userTransactionObjTab[1].length() - 1));
+                                DecimalFormat df = new DecimalFormat("0.00");
+                                userTransaction.setUsd(df.format(usd));
+                            } else if (userTransactionObjTab[0].equals("\"order_id\"")) {
+                                userTransaction.setOrderId(userTransactionObjTab[1]);
+                            } else if (userTransactionObjTab[0].contains("_usd")) {
+                                Double cryptoUsd = Double.parseDouble(userTransactionObjTab[1]);
+                                userTransaction.setCryptoUsd(String.format("%.5f", cryptoUsd));
+                                userTransaction.setCryptoUsdName(userTransactionObjTab[0].substring(1, userTransactionObjTab[0].length() - 1));
+                            } else if (userTransactionObjTab[0].equals("\"datetime\"")) {
+                                userTransaction.setDatetime(userTransactionObjTab[1].substring(1, userTransactionObjTab[1].length() - 2));
+                            } else if (userTransactionObjTab[0].equals("\"fee\"")) {
+                                Double fee = Double.parseDouble(userTransactionObjTab[1].substring(1, userTransactionObjTab[1].length() - 1));
+                                DecimalFormat df = new DecimalFormat("0.00");
+                                userTransaction.setFee(df.format(fee));
+                            } else if (userTransactionObjTab[0].equals("\"btc\"")) {
+                                userTransaction.setBtc(userTransactionObjTab[1]);
+                                if (!userTransactionObjTab[1].equals("0.0")) {
+                                    goToElse = false;
+                                    Double cryptoAmount = Double.parseDouble(userTransactionObjTab[1].substring(1, userTransactionObjTab[1].length() - 1));
+                                    userTransaction.setCryptoAmount(String.format("%.4f", cryptoAmount));
+                                    userTransaction.setCryptoAmountName(userTransactionObjTab[0].substring(1, userTransactionObjTab[0].length() - 1));
+                                }
+                            } else if (userTransactionObjTab[0].equals("\"type\"")) {
+                                userTransaction.setType(userTransactionObjTab[1].substring(1, userTransactionObjTab[1].length() - 1));
+                            } else if (userTransactionObjTab[0].equals("\"id\"")) {
+                                userTransaction.setId(userTransactionObjTab[1]);
+                            } else if (userTransactionObjTab[0].equals("\"eur\"")) {
+                                userTransaction.setEur(userTransactionObjTab[1]);
+                            } else {
+                                if (goToElse) {
+                                    Double cryptoAmount = Double.parseDouble(userTransactionObjTab[1].substring(1, userTransactionObjTab[1].length() - 1));
+                                    userTransaction.setCryptoAmount(String.format("%.4f", cryptoAmount));
+                                    userTransaction.setCryptoAmountName(userTransactionObjTab[0].substring(1, userTransactionObjTab[0].length() - 1));
+                                }
+                            }
+                        }
+                        if (show) {
+                            if (userTransactionSoldList.size() < 20) {
+                                userTransactionSoldList.add(userTransaction);
+                            }
+                        } else {
+                            if (userTransactionBoughtList.size() < 20) {
+                                userTransactionBoughtList.add(userTransaction);
+                            }
+                        }
+                    }
+                } else {
+                    System.out.println("excluded => resultSubTab[" + i + "] :" + resultSubTab[i]);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        ModelAndView modelAndView = new ModelAndView("bitstamp/latestBoughtAndSoldByCryptoName");
+        modelAndView.addObject("userTransactionSoldList", userTransactionSoldList);
+        modelAndView.addObject("userTransactionBoughtList", userTransactionBoughtList);
+        modelAndView.addObject("cryptoNameForSelectBoxByName", cryptoNameForSelectBox.getName());
+        return  modelAndView;
     }
 
     @PostMapping(value = {"bitstamp/chart/{cryptoId}"})

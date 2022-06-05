@@ -14,19 +14,20 @@
                 <table id="dtBasicExample104" class="table table-dark table-striped table-hover">
                     <tbody>
                         <tr>
-                            <!--<form th:target="_blank" th:action="@{/bitstamp/lastboughtcrypto}" th:object="${paidPriceObject}" method="POST">&ndash;&gt;-->
+                            <form th:target="_blank" th:action="@{/bitstamp/lastboughtcrypto}" th:object="${cryptoNameForSelectBox}" method="POST">
                             <td>
                                 Select crypto name (buy & sell):
                             </td>
                             <td>
-                                <select name="cryptoBoughtAndSoldName" id="cryptoBoughtAndSoldName">
+                                <select th:field="*{name}">
+                                <!--<select>-->
                                     <option th:each="cryptoNameBoughtAndSold : ${cryptoNameBoughtAndSoldList}" th:value="${cryptoNameBoughtAndSold}" th:text="${cryptoNameBoughtAndSold}"></option>
                                 </select>
                             </td>
                             <td>
                                 <input type="submit" th:value="Generate" />
                             </td>
-                            <!--</form>-->
+                            </form>
                         </tr>
                     </tbody>
                 </table>
