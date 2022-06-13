@@ -1,4 +1,4 @@
-package com.example.schedulerdemo.config;
+package com.yan.wang.scheduler.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;

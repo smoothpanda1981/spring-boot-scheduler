@@ -1,4 +1,4 @@
-package com.example.schedulerdemo;
+package com.yan.wang.scheduler;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
