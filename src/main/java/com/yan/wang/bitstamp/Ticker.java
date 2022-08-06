@@ -11,6 +11,8 @@ public class Ticker {
 	public String low;
 	public String ask;
 	public String open;
+	public String percent_change_24;
+	public String open_24;
 
 	public String getHigh() {
 		return high;
@@ -82,5 +84,21 @@ public class Ticker {
 
 	public void setOpen(String open) {
 		this.open = open;
+	}
+
+	public String getPercent_change_24() {
+		return percent_change_24;
+	}
+
+	public void setPercent_change_24(String percent_change_24) {
+		this.percent_change_24 = percent_change_24;
+	}
+
+	public String getOpen_24() {
+		return open_24;
+	}
+
+	public void setOpen_24(String open_24) {
+		this.open_24 = open_24;
 	}
 }

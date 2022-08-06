@@ -832,7 +832,7 @@ public class BitstampController {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-//        System.out.println("balance :" + response.body());
+        System.out.println("balance :" + response.body());
         return response.body();
     }
 

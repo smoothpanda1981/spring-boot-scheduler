@@ -27,6 +27,9 @@
                 <li th:classappend="${module == 'bitstamp' ? 'active' : ''}">
                     <a href="#about" th:href="@{/bitstamp}">Bitstamp</a>
                 </li>
+                <li th:classappend="${module == 'googlesheet' ? 'active' : ''}">
+                    <a href="#about" th:href="@{/googlesheet}">GoogleSheet</a>
+                </li>
                 <li th:classappend="${module == 'about' ? 'active' : ''}">
                     <a href="#about" th:href="@{/about}">About</a>
                 </li>
